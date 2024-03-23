@@ -1,0 +1,3 @@
+/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/build/CMakeFiles/AOdemo.dir
+/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/build/CMakeFiles/rebuild_cache.dir
