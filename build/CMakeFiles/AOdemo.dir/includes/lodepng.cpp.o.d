@@ -1,7 +1,7 @@
 CMakeFiles/AOdemo.dir/includes/lodepng.cpp.o: \
- /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/lodepng.cpp \
+ /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/lodepng.cpp \
  /usr/include/stdc-predef.h \
- /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/lodepng.h \
+ /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/lodepng.h \
  /usr/include/string.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/features-time64.h \
