@@ -17,8 +17,6 @@ Camera camera;
 
 vector<shared_ptr<Object>> scene;
 shared_ptr<LightCubeObject> lightCubeObj;
-bool isSpaceKeyPressed = false;
-float tessLevel = 16.0f;
 
 void display() { 
     cy::Matrix4f view = camera.getLookAtMatrix();
@@ -50,7 +48,6 @@ int main(int argc, char** argv) {
     scene.push_back(areaLight);
 
     cy::Vec3f lightPos = (areaLight->mesh.GetBoundMin() + areaLight->mesh.GetBoundMax()) * 0.5f;
-    //lightPos = cy::Vec3f(lightPos.x, lightPos.y-0.2f, lightPos.z);
 
     shared_ptr<Object> ceiling = Init::initUntexturedModel("ceiling.obj", "reflection_vs.txt", "reflection_fs.txt");
     scene.push_back(ceiling);
@@ -73,7 +70,7 @@ int main(int argc, char** argv) {
     // init cameras
     Init::initCamera(&camera);
 
-     // initialize some uniforms
+    // initialize some uniforms
     for (shared_ptr<Object> modelObj : scene) {
         modelObj->prog["ambientStr"] = 0.1f;
         modelObj->prog["Ka"] = cy::Vec3f(modelObj->mesh.M(0).Ka[0],modelObj->mesh.M(0).Ka[1],modelObj->mesh.M(0).Ka[2]);
@@ -83,8 +80,6 @@ int main(int argc, char** argv) {
         modelObj->prog["lightColor"] = cy::Vec3f(1.0f,1.0f,1.0f);
         modelObj->prog["lightPos"] = lightPos;
     }
-
-
 
     glutMainLoop();
 

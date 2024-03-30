@@ -173,7 +173,6 @@ CMakeFiles/AOdemo.dir/includes/lodepng.cpp.o: /mnt/c/Users/tewar/Documents/Utah/
   /usr/include/c++/11/stdlib.h
 
 CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/main.cpp \
-  /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/main.cpp \
   /usr/include/stdc-predef.h \
   /usr/include/GL/glew.h \
   /usr/include/c++/11/cstddef \
@@ -361,9 +360,9 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
   /usr/include/c++/11/bits/ostream.tcc \
   /usr/include/c++/11/istream \
   /usr/include/c++/11/bits/istream.tcc \
-  /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/cyTriMesh.h \
-  /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/cyVector.h \
-  /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/cyCore.h \
+  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/cyTriMesh.h \
+  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/cyVector.h \
+  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/cyCore.h \
   /usr/include/c++/11/cstring \
   /usr/include/string.h \
   /usr/include/strings.h \
@@ -483,8 +482,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
   /usr/include/c++/11/bits/stl_vector.h \
   /usr/include/c++/11/bits/stl_bvector.h \
   /usr/include/c++/11/bits/vector.tcc \
-  /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/cyMatrix.h \
-  /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/cyGL.h \
+  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/cyMatrix.h \
+  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/cyGL.h \
   /usr/include/c++/11/fstream \
   /usr/include/c++/11/bits/codecvt.h \
   /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
@@ -502,11 +501,11 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
   /usr/include/X11/keysymdef.h \
   /usr/include/GL/glxext.h \
   /usr/include/inttypes.h \
-  /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/lodepng.h \
-  /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/Camera.h \
-  /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/Util.h \
-  /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/Object.h \
-  /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/Init.h \
+  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/lodepng.h \
+  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Camera.h \
+  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Util.h \
+  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Object.h \
+  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Init.h \
   /usr/include/c++/11/memory \
   /usr/include/c++/11/bits/stl_tempbuf.h \
   /usr/include/c++/11/bits/stl_raw_storage_iter.h \
@@ -531,7 +530,7 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
   /usr/include/c++/11/backward/auto_ptr.h \
   /usr/include/c++/11/pstl/glue_memory_defs.h \
   /usr/include/c++/11/pstl/execution_defs.h \
-  /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/PredefinedModels.h
+  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/PredefinedModels.h
 
 
 /usr/include/c++/11/pstl/glue_memory_defs.h:
@@ -558,21 +557,17 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/c++/11/bit:
 
-/usr/include/c++/11/bits/align.h:
-
 /usr/include/c++/11/bits/stl_raw_storage_iter.h:
 
 /usr/include/c++/11/bits/stl_tempbuf.h:
 
 /usr/include/c++/11/memory:
 
-/mnt/c/Users/tewar/Documents/Utah/FinalProject/source/Init.h:
+/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Init.h:
 
-/mnt/c/Users/tewar/Documents/Utah/FinalProject/source/Object.h:
+/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Object.h:
 
-/mnt/c/Users/tewar/Documents/Utah/FinalProject/source/Util.h:
-
-/usr/include/inttypes.h:
+/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Util.h:
 
 /usr/include/X11/keysymdef.h:
 
@@ -598,7 +593,9 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/c++/11/fstream:
 
-/mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/cyGL.h:
+/usr/include/inttypes.h:
+
+/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/cyMatrix.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/keylockerintrin.h:
 
@@ -614,6 +611,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/vaesintrin.h:
 
+/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/lodepng.h:
+
 /usr/lib/gcc/x86_64-linux-gnu/11/include/gfniintrin.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/f16cintrin.h:
@@ -621,8 +620,6 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/lib/gcc/x86_64-linux-gnu/11/include/fmaintrin.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/shaintrin.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/avx512vp2intersectvlintrin.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/avx512vp2intersectintrin.h:
 
@@ -635,6 +632,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/lib/gcc/x86_64-linux-gnu/11/include/avx5124vnniwintrin.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/avx5124fmapsintrin.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/avx512vbmivlintrin.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/avx512vbmiintrin.h:
 
@@ -782,8 +781,6 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/c++/11/bits/stl_algobase.h:
 
-/mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/cyTriMesh.h:
-
 /usr/lib/gcc/x86_64-linux-gnu/11/include/uintrintrin.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
@@ -838,8 +835,6 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/GL/glew.h:
 
-/mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/cyMatrix.h:
-
 /usr/include/c++/11/streambuf:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/ia32intrin.h:
@@ -893,6 +888,10 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/include/c++/11/ext/numeric_traits.h:
 
 /usr/include/features.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/avx512vp2intersectvlintrin.h:
+
+/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/cyCore.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/prfchwintrin.h:
 
@@ -964,6 +963,10 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/ctype.h:
 
+/usr/include/c++/11/bits/align.h:
+
+/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/cyVector.h:
+
 /usr/include/c++/11/bits/cpp_type_traits.h:
 
 /usr/include/c++/11/bits/stl_iterator_base_funcs.h:
@@ -973,6 +976,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/include/x86_64-linux-gnu/bits/endianness.h:
 
 /usr/include/c++/11/tr1/modified_bessel_func.tcc:
+
+/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/PredefinedModels.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/mm_malloc.h:
 
@@ -1056,6 +1061,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/x86_64-linux-gnu/bits/uintn-identity.h:
 
+/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
+
 /usr/lib/gcc/x86_64-linux-gnu/11/include/avx512ifmavlintrin.h:
 
 /usr/include/alloca.h:
@@ -1071,6 +1078,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/include/c++/11/cerrno:
 
 /usr/include/errno.h:
+
+/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Camera.h:
 
 /usr/include/x86_64-linux-gnu/bits/errno.h:
 
@@ -1091,8 +1100,6 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
 
 /usr/include/c++/11/bits/charconv.h:
-
-/mnt/c/Users/tewar/Documents/Utah/FinalProject/source/main.cpp:
 
 /usr/include/c++/11/bits/basic_string.tcc:
 
@@ -1170,6 +1177,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/c++/11/tr1/bessel_function.tcc:
 
+/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/cyGL.h:
+
 /usr/include/c++/11/bits/basic_ios.h:
 
 /usr/include/c++/11/bits/exception.h:
@@ -1190,23 +1199,11 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/c++/11/bits/locale_facets.tcc:
 
-/mnt/c/Users/tewar/Documents/Utah/FinalProject/source/Camera.h:
-
 /usr/include/c++/11/bits/codecvt.h:
 
 /usr/include/c++/11/bits/basic_ios.tcc:
 
 /usr/include/c++/11/istream:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/avx512vbmivlintrin.h:
-
-/mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/cyVector.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
-
-/mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/cyCore.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/cldemoteintrin.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/pconfigintrin.h:
 
@@ -1230,8 +1227,6 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h:
 
-/mnt/c/Users/tewar/Documents/Utah/FinalProject/source/PredefinedModels.h:
-
 /usr/include/x86_64-linux-gnu/bits/mathcalls.h:
 
 /usr/include/c++/11/bits/postypes.h:
@@ -1239,6 +1234,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:
 
 /usr/include/x86_64-linux-gnu/bits/iscanonical.h:
+
+/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/cyTriMesh.h:
 
 /usr/include/c++/11/bits/specfun.h:
 
@@ -1257,6 +1254,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/include/c++/11/tr1/riemann_zeta.tcc:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/x86gprintrin.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/cldemoteintrin.h:
 
 /usr/include/c++/11/string:
 

@@ -48,8 +48,6 @@ public:
     void storeAllVertices() {
         positions = std::vector<cy::Vec3f>(mesh.NV());
         normals = std::vector<cy::Vec3f>(mesh.NV());
-        
-
         for (int i=0;i<mesh.NF(); i++) {
             cy::TriMesh::TriFace f = mesh.F(i); //indices for positions
             cy::TriMesh::TriFace fn = mesh.FN(i); //indices for normals

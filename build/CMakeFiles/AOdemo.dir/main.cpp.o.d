@@ -1,5 +1,5 @@
 CMakeFiles/AOdemo.dir/main.cpp.o: \
- /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/main.cpp \
+ /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/main.cpp \
  /usr/include/stdc-predef.h /usr/include/GL/glew.h \
  /usr/include/c++/11/cstddef \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
@@ -153,9 +153,9 @@ CMakeFiles/AOdemo.dir/main.cpp.o: \
  /usr/include/c++/11/bits/basic_ios.tcc \
  /usr/include/c++/11/bits/ostream.tcc /usr/include/c++/11/istream \
  /usr/include/c++/11/bits/istream.tcc \
- /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/cyTriMesh.h \
- /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/cyVector.h \
- /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/cyCore.h \
+ /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/cyTriMesh.h \
+ /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/cyVector.h \
+ /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/cyCore.h \
  /usr/include/c++/11/cstring /usr/include/string.h /usr/include/strings.h \
  /usr/include/c++/11/cassert /usr/include/assert.h \
  /usr/include/c++/11/cmath /usr/include/math.h \
@@ -269,8 +269,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: \
  /usr/include/c++/11/bits/stl_vector.h \
  /usr/include/c++/11/bits/stl_bvector.h \
  /usr/include/c++/11/bits/vector.tcc \
- /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/cyMatrix.h \
- /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/cyGL.h \
+ /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/cyMatrix.h \
+ /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/cyGL.h \
  /usr/include/c++/11/fstream /usr/include/c++/11/bits/codecvt.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
@@ -281,11 +281,11 @@ CMakeFiles/AOdemo.dir/main.cpp.o: \
  /usr/include/X11/Xutil.h /usr/include/X11/keysym.h \
  /usr/include/X11/keysymdef.h /usr/include/GL/glxext.h \
  /usr/include/inttypes.h \
- /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/lodepng.h \
- /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/Camera.h \
- /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/Util.h \
- /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/Object.h \
- /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/Init.h \
+ /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/lodepng.h \
+ /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Camera.h \
+ /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Util.h \
+ /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Object.h \
+ /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Init.h \
  /usr/include/c++/11/memory /usr/include/c++/11/bits/stl_tempbuf.h \
  /usr/include/c++/11/bits/stl_raw_storage_iter.h \
  /usr/include/c++/11/bits/align.h /usr/include/c++/11/bit \
@@ -305,4 +305,4 @@ CMakeFiles/AOdemo.dir/main.cpp.o: \
  /usr/include/c++/11/backward/auto_ptr.h \
  /usr/include/c++/11/pstl/glue_memory_defs.h \
  /usr/include/c++/11/pstl/execution_defs.h \
- /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/PredefinedModels.h
+ /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/PredefinedModels.h
