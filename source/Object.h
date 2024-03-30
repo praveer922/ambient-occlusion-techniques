@@ -16,7 +16,7 @@ public:
     }
 
     cy::Matrix4f modelMatrix; // Model matrix for the object
-    std::vector<cy::GLSLProgram> progs; 
+    std::vector<cy::GLSLProgram *> progs; 
     GLuint VAO;
     
     cy::TriMesh mesh;
@@ -28,7 +28,7 @@ public:
 
     void loadModel(const char * filename) {
         bool success = mesh.LoadFromFileObj(filename);
-        if (!success) {
+        if (!success) { 
             cout << "Model loading failed." << endl;
             exit(0);
         } else {
@@ -58,6 +58,6 @@ public:
     void addProg(const std::string& vsFile, const std::string& fsFile) {
         cy::GLSLProgram* newProg = new cy::GLSLProgram();
         newProg->BuildFiles(vsFile.c_str(),fsFile.c_str());
-        progs.push_back(*newProg);
+        progs.push_back(newProg);
     }
 };

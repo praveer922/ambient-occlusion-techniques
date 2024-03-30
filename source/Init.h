@@ -42,7 +42,7 @@ namespace Init {
 
     }
 
-    shared_ptr<Object> initUntexturedModel(const char * objFile, const char * vs, const char * fs) {
+    shared_ptr<Object> initUntexturedModel(const char * objFile) {
         // create a model object with vs and fs shaders
         shared_ptr<Object> modelObj = make_shared<Object>();
         modelObj->loadModel(objFile);
