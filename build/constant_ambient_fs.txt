@@ -19,7 +19,7 @@ uniform vec3 lightPos;
 
 // all of this is done in world space 
 
-float ambientStr = 0;
+float ambientStr = 0.2f;
 
 void main()
 {    

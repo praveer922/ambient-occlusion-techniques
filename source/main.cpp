@@ -14,9 +14,7 @@
 using namespace std;
 
 Camera camera;
-
 vector<shared_ptr<Object>> scene;
-shared_ptr<LightCubeObject> lightCubeObj;
 int AOMode = 0;
 
 void display() { 
@@ -24,13 +22,25 @@ void display() {
     cy::Matrix4f proj = camera.getProjectionMatrix();
     // draw actual scene
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    for (shared_ptr<Object> modelObj : scene) {
-        modelObj->prog.Bind();
-        modelObj->prog["model"] = modelObj->modelMatrix;
-        modelObj->prog["view"] = view;
-        modelObj->prog["projection"] = proj;
-        modelObj->prog["cameraWorldSpacePos"] = camera.getPosition();
-        modelObj->prog["AOMode"] = AOMode;
+
+    // draw light
+    scene[0]->progs[0].Bind();
+    scene[0]->progs[0]["model"] = scene[0]->modelMatrix;
+    scene[0]->progs[0]["view"] = view;
+    scene[0]->progs[0]["projection"] = proj;
+    scene[0]->progs[0]["cameraWorldSpacePos"] = camera.getPosition();
+    glBindVertexArray(scene[0]->VAO);
+    glDrawElements(GL_TRIANGLES, scene[0]->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+
+
+    // draw all other models
+    for (int i=1;i<scene.size();i++) {
+        shared_ptr<Object> modelObj = scene[i];
+        modelObj->progs[0].Bind();
+        modelObj->progs[0]["model"] = modelObj->modelMatrix;
+        modelObj->progs[0]["view"] = view;
+        modelObj->progs[0]["projection"] = proj;
+        modelObj->progs[0]["cameraWorldSpacePos"] = camera.getPosition();
         glBindVertexArray(modelObj->VAO);
         glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
     }
@@ -43,13 +53,11 @@ int main(int argc, char** argv) {
     Init::initGL("Ambient Occlusion Techniques", argc, argv);
     Init::setCallbacks(display);
 
-    shared_ptr<Object> backWall = Init::initUntexturedModel("back_wall.obj", "vs.txt", "no_ambient_fs.txt");
-    scene.push_back(backWall);
-
     shared_ptr<Object> areaLight = Init::initUntexturedModel("area_light.obj", "vs.txt", "light_fs.txt");
     scene.push_back(areaLight);
 
-    cy::Vec3f lightPos = (areaLight->mesh.GetBoundMin() + areaLight->mesh.GetBoundMax()) * 0.5f;
+    shared_ptr<Object> backWall = Init::initUntexturedModel("back_wall.obj", "vs.txt", "no_ambient_fs.txt");
+    scene.push_back(backWall);
 
     shared_ptr<Object> ceiling = Init::initUntexturedModel("ceiling.obj", "vs.txt", "no_ambient_fs.txt");
     scene.push_back(ceiling);
@@ -73,15 +81,34 @@ int main(int argc, char** argv) {
     Init::initCamera(&camera);
 
     // initialize some uniforms
-    for (shared_ptr<Object> modelObj : scene) {
-        modelObj->prog["ambientStr"] = 0.1f;
-        modelObj->prog["Ka"] = cy::Vec3f(modelObj->mesh.M(0).Ka[0],modelObj->mesh.M(0).Ka[1],modelObj->mesh.M(0).Ka[2]);
-        modelObj->prog["Kd"] = cy::Vec3f(modelObj->mesh.M(0).Kd[0], modelObj->mesh.M(0).Kd[1], modelObj->mesh.M(0).Kd[2]);
-        modelObj->prog["Ks"] = cy::Vec3f(modelObj->mesh.M(0).Ks[0],modelObj->mesh.M(0).Ks[1],modelObj->mesh.M(0).Ks[2]);
-        modelObj->prog["Ns"] = modelObj->mesh.M(0).Ns;
-        modelObj->prog["lightColor"] = cy::Vec3f(1.0f,1.0f,1.0f);
-        modelObj->prog["lightPos"] = lightPos;
+    cy::Vec3f lightPos = (areaLight->mesh.GetBoundMin() + areaLight->mesh.GetBoundMax()) * 0.5f;
+    scene[0]->addProg("vs.txt", "light_fs.txt"); // shader program for the light itself
+    
+    for (int i=1;i<scene.size();i++) {
+        shared_ptr<Object> modelObj = scene[i];
+
+        // build no ambient light shader
+        modelObj->addProg("vs.txt","no_ambient_fs.txt");
+        modelObj->progs[0]["Ka"] = cy::Vec3f(modelObj->mesh.M(0).Ka[0],modelObj->mesh.M(0).Ka[1],modelObj->mesh.M(0).Ka[2]);
+        modelObj->progs[0]["Kd"] = cy::Vec3f(modelObj->mesh.M(0).Kd[0], modelObj->mesh.M(0).Kd[1], modelObj->mesh.M(0).Kd[2]);
+        modelObj->progs[0]["Ks"] = cy::Vec3f(modelObj->mesh.M(0).Ks[0],modelObj->mesh.M(0).Ks[1],modelObj->mesh.M(0).Ks[2]);
+        modelObj->progs[0]["Ns"] = modelObj->mesh.M(0).Ns;
+        modelObj->progs[0]["lightColor"] = cy::Vec3f(1.0f,1.0f,1.0f);
+        modelObj->progs[0]["lightPos"] = lightPos;
+
+        // build constant ambient light shader
+
+        //modelObj->addProg("vs.txt","constant_ambient_fs.txt");
+        // modelObj->progs[1].Bind();
+        // modelObj->progs[1]["Ka"] = cy::Vec3f(modelObj->mesh.M(0).Ka[0],modelObj->mesh.M(0).Ka[1],modelObj->mesh.M(0).Ka[2]);
+        // modelObj->progs[1]["Kd"] = cy::Vec3f(modelObj->mesh.M(0).Kd[0], modelObj->mesh.M(0).Kd[1], modelObj->mesh.M(0).Kd[2]);
+        // modelObj->progs[1]["Ks"] = cy::Vec3f(modelObj->mesh.M(0).Ks[0],modelObj->mesh.M(0).Ks[1],modelObj->mesh.M(0).Ks[2]);
+        // modelObj->progs[1]["Ns"] = modelObj->mesh.M(0).Ns;
+        // modelObj->progs[1]["lightColor"] = cy::Vec3f(1.0f,1.0f,1.0f);
+        // modelObj->progs[1]["lightPos"] = lightPos;
     }
+
+
 
     glutMainLoop();
 

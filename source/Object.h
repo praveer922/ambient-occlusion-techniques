@@ -12,15 +12,11 @@ using namespace std;
 
 class Object {
 public:
-    Object(const std::string& vsFile, const std::string& fsFile) 
-        : modelMatrix(cy::Matrix4f(1.0)), vsFile(vsFile), fsFile(fsFile) {
-            prog.BuildFiles(vsFile.c_str(),fsFile.c_str());
+    Object() : modelMatrix(cy::Matrix4f(1.0)) {
     }
 
     cy::Matrix4f modelMatrix; // Model matrix for the object
-    string vsFile;    // Vertex shader file path
-    string fsFile;    // Fragment shader file path
-    cy::GLSLProgram prog;
+    std::vector<cy::GLSLProgram> progs; 
     GLuint VAO;
     
     cy::TriMesh mesh;
@@ -58,59 +54,10 @@ public:
             }
         }
     }
-};
 
-
-class LightCubeObject : public Object {
-public:
-    LightCubeObject(std::vector<float>* vertices, cy::Vec3f worldSpacePos, cy::Vec3f lightColor, const std::string& vsFile, const std::string& fsFile) 
-        : Object(vsFile, fsFile), vertices(vertices), worldSpacePos(worldSpacePos), lightColor(lightColor), rot_y(0.0f), rot_z(0.0f) {
-            prog.BuildFiles(vsFile.c_str(),fsFile.c_str());
-            // update the model matrix so that the vertices are translated to the given worldSpacePos
-            modelMatrix = cy::Matrix4f::Translation(worldSpacePos);
-    }
-    
-    std::vector<float>* vertices; // Pointer to a vector of vertices
-    cy::Vec3f worldSpacePos;
-    cy::Vec3f lightColor;
-    float rot_y;
-    float rot_z;
-
-    void updateModelMatrix() {
-        // update model matrix based on worldSpacePos()
-        modelMatrix = cy::Matrix4f::Translation(worldSpacePos);
-    }
-
-
-    void processMouseMovement(float xoffset, float yoffset, bool leftButtonPressed) {
-        if (leftButtonPressed) {
-            rot_y -=xoffset * 0.01f;
-            rot_z += yoffset * 0.01f;
-        }
-
-        // update worldSpacePos and model matrix with new rot values
-        worldSpacePos = cy::Matrix3f::RotationY(Util::degreesToRadians(rot_y)) * cy::Matrix3f::RotationZ(Util::degreesToRadians(rot_z)) * worldSpacePos;
-        updateModelMatrix();
-
-    }
-    
-};
-
-class PlaneObject : public Object {
-    public:
-    PlaneObject(std::vector<float>* vertices, cy::Vec3f worldSpacePos, const std::string& vsFile, const std::string& fsFile) 
-        : Object(vsFile, fsFile), vertices(vertices), worldSpacePos(worldSpacePos) {
-            prog.BuildFiles(vsFile.c_str(),fsFile.c_str());
-            // update the model matrix so that the vertices are translated to the given worldSpacePos
-            modelMatrix = cy::Matrix4f::Translation(worldSpacePos);
-    }
-    
-    std::vector<float>* vertices; // Pointer to a vector of vertices
-    cy::Vec3f worldSpacePos;
-    cy::GLSLProgram geometryProg;
-
-    void updateModelMatrix() {
-        // update model matrix based on worldSpacePos()
-        modelMatrix = cy::Matrix4f::Translation(worldSpacePos);
+    void addProg(const std::string& vsFile, const std::string& fsFile) {
+        cy::GLSLProgram* newProg = new cy::GLSLProgram();
+        newProg->BuildFiles(vsFile.c_str(),fsFile.c_str());
+        progs.push_back(*newProg);
     }
 };

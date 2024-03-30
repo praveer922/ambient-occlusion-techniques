@@ -9,7 +9,7 @@ using namespace std;
 
 class Camera {
 public:
-    Camera(cy::Vec3f worldSpacePosition = {-0.5f,3.0f,5.0f}) : position(worldSpacePosition), front(0.0f, 0.0f, -1.0f), up(0.0f, 1.0f, 0.0f), 
+    Camera(cy::Vec3f worldSpacePosition = {-0.5f,4.5f,5.0f}) : position(worldSpacePosition), front(0.0f, 0.0f, -1.0f), up(0.0f, 1.0f, 0.0f), 
     yaw(-90.0f), pitch(0.0f), movementSpeed(2.5f), mouseSensitivity(0.1f), orthogonal_projection_on(false),
     perspectiveMatrix(cy::Matrix4f(1.0)), orthographicMatrix(cy::Matrix4f(1.0)){
         update();

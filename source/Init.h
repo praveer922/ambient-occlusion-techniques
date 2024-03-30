@@ -13,9 +13,7 @@ namespace Init {
     bool leftButtonPressed = false;
     bool altButtonPressed = false;
     Camera* cameraPtr;
-    Camera* planeCameraPtr;
     shared_ptr<Object> modelObjPtr;
-    shared_ptr<LightCubeObject> lightCubeObjPtr;
 
     void initGL(const char *name, int argc, char** argv) {
         // Initialize GLUT
@@ -44,28 +42,9 @@ namespace Init {
 
     }
 
-    void initLightCube(shared_ptr<LightCubeObject> &lightCubeObj, const char * vs, const char * fs) {
-        // create lightcube object at (15,15,15) with color (1,1,1)
-        lightCubeObj = make_shared<LightCubeObject>(&PredefinedModels::lightCubeVertices, 
-                                                    cy::Vec3f(15.0, 15.0, 15.0), cy::Vec3f(1.0f,1.0f,1.0f), 
-                                                    vs, fs);
-        lightCubeObjPtr = lightCubeObj;
-
-        // set up light cube
-        glGenVertexArrays(1, &(lightCubeObjPtr->VAO)); 
-        glBindVertexArray(lightCubeObjPtr->VAO);
-
-        GLuint lightCubeVBO;
-        glGenBuffers(1, &lightCubeVBO);
-        glBindBuffer(GL_ARRAY_BUFFER, lightCubeVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * lightCubeObjPtr->vertices->size(), lightCubeObjPtr->vertices->data(), GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    }
-
     shared_ptr<Object> initUntexturedModel(const char * objFile, const char * vs, const char * fs) {
         // create a model object with vs and fs shaders
-        shared_ptr<Object> modelObj = make_shared<Object>(vs, fs);
+        shared_ptr<Object> modelObj = make_shared<Object>();
         modelObj->loadModel(objFile);
 
         // set up VAO and VBO and EBO and NBO
