@@ -17,6 +17,7 @@ Camera camera;
 
 vector<shared_ptr<Object>> scene;
 shared_ptr<LightCubeObject> lightCubeObj;
+int AOMode = 0;
 
 void display() { 
     cy::Matrix4f view = camera.getLookAtMatrix();
@@ -29,6 +30,7 @@ void display() {
         modelObj->prog["view"] = view;
         modelObj->prog["projection"] = proj;
         modelObj->prog["cameraWorldSpacePos"] = camera.getPosition();
+        modelObj->prog["AOMode"] = AOMode;
         glBindVertexArray(modelObj->VAO);
         glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
     }
@@ -38,33 +40,33 @@ void display() {
 
 int main(int argc, char** argv) {
 
-    Init::initGL("Final Project: Ambient Occlusion Techniques", argc, argv);
+    Init::initGL("Ambient Occlusion Techniques", argc, argv);
     Init::setCallbacks(display);
 
-    shared_ptr<Object> backWall = Init::initUntexturedModel("back_wall.obj", "reflection_vs.txt", "reflection_fs.txt");
+    shared_ptr<Object> backWall = Init::initUntexturedModel("back_wall.obj", "vs.txt", "no_ambient_fs.txt");
     scene.push_back(backWall);
 
-    shared_ptr<Object> areaLight = Init::initUntexturedModel("area_light.obj", "reflection_vs.txt", "lightcube_fs.txt");
+    shared_ptr<Object> areaLight = Init::initUntexturedModel("area_light.obj", "vs.txt", "light_fs.txt");
     scene.push_back(areaLight);
 
     cy::Vec3f lightPos = (areaLight->mesh.GetBoundMin() + areaLight->mesh.GetBoundMax()) * 0.5f;
 
-    shared_ptr<Object> ceiling = Init::initUntexturedModel("ceiling.obj", "reflection_vs.txt", "reflection_fs.txt");
+    shared_ptr<Object> ceiling = Init::initUntexturedModel("ceiling.obj", "vs.txt", "no_ambient_fs.txt");
     scene.push_back(ceiling);
 
-    shared_ptr<Object> floor = Init::initUntexturedModel("floor.obj", "reflection_vs.txt", "reflection_fs.txt");
+    shared_ptr<Object> floor = Init::initUntexturedModel("floor.obj", "vs.txt", "no_ambient_fs.txt");
     scene.push_back(floor);
 
-    shared_ptr<Object> leftWall = Init::initUntexturedModel("left_wall.obj", "reflection_vs.txt", "reflection_fs.txt");
+    shared_ptr<Object> leftWall = Init::initUntexturedModel("left_wall.obj", "vs.txt", "no_ambient_fs.txt");
     scene.push_back(leftWall);
 
-    shared_ptr<Object> rightWall = Init::initUntexturedModel("right_wall.obj", "reflection_vs.txt", "reflection_fs.txt");
+    shared_ptr<Object> rightWall = Init::initUntexturedModel("right_wall.obj", "vs.txt", "no_ambient_fs.txt");
     scene.push_back(rightWall);
 
-    shared_ptr<Object> shortBox = Init::initUntexturedModel("short_box.obj", "reflection_vs.txt", "reflection_fs.txt");
+    shared_ptr<Object> shortBox = Init::initUntexturedModel("short_box.obj", "vs.txt", "no_ambient_fs.txt");
     scene.push_back(shortBox);
 
-    shared_ptr<Object> tallBox = Init::initUntexturedModel("tall_box.obj", "reflection_vs.txt", "reflection_fs.txt");
+    shared_ptr<Object> tallBox = Init::initUntexturedModel("tall_box.obj", "vs.txt", "no_ambient_fs.txt");
     scene.push_back(tallBox);
     
     // init cameras
