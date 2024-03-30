@@ -7,11 +7,11 @@
 
 using namespace std;
 
+extern int AOMode;
+
 namespace Init {
     float lastX = 400, lastY = 300;
-    bool controlKeyPressed = false;
     bool leftButtonPressed = false;
-    bool altButtonPressed = false;
     Camera* cameraPtr;
     shared_ptr<Object> modelObjPtr;
 
@@ -76,7 +76,14 @@ namespace Init {
     void keyboard(unsigned char key, int x, int y) {
         if (key == 27) {  // ASCII value for the Esc key
             glutLeaveMainLoop();
-        } 
+        } else if (key == 'n' || key == 'N') { 
+            AOMode = 0;
+            cout << "Switched to no ambient light mode." << endl;
+        } else if (key == 'c' || key == 'C') { 
+            AOMode = 1;
+            cout << "Switched to constant ambient light." << endl;
+        }
+        glutPostRedisplay();
     }
 
     void handleMouse(int button, int state, int x, int y) {

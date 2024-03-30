@@ -15,7 +15,7 @@ using namespace std;
 
 Camera camera;
 vector<shared_ptr<Object>> scene;
-int AOMode = 1;
+int AOMode = 0;
 
 void display() { 
     cy::Matrix4f view = camera.getLookAtMatrix();
