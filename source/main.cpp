@@ -24,39 +24,44 @@ void display() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    if (AOMode <= 1) {
+        // draw light
+        scene[0]->progs[0]->Bind();
+        (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
+        (*scene[0]->progs[0])["view"] = view;
+        (*scene[0]->progs[0])["projection"] = proj;
+        (*scene[0]->progs[0])["cameraWorldSpacePos"] = camera.getPosition();
+        glBindVertexArray(scene[0]->VAO);
+        glDrawElements(GL_TRIANGLES, scene[0]->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
 
-    if (AOMode > 1) {
+
+        // draw all other models
+        for (int i=1;i<scene.size();i++) {
+            shared_ptr<Object> modelObj = scene[i];
+            modelObj->progs[AOMode]->Bind();
+            (*modelObj->progs[AOMode])["model"] = modelObj->modelMatrix;
+            (*modelObj->progs[AOMode])["view"] = view;
+            (*modelObj->progs[AOMode])["projection"] = proj;
+            (*modelObj->progs[AOMode])["cameraWorldSpacePos"] = camera.getPosition();
+            glBindVertexArray(modelObj->VAO);
+            glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+        }
+    } else if (AOMode > 1) {
         // 1. geometry pass: render scene's geometry/color data into gbuffer
         // -----------------------------------------------------------------
         glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-
-
+        for (int i=1;i<scene.size();i++) {
+            shared_ptr<Object> modelObj = scene[i];
+            modelObj->progs[2]->Bind();
+            (*modelObj->progs[2])["model"] = modelObj->modelMatrix;
+            (*modelObj->progs[2])["view"] = view;
+            (*modelObj->progs[2])["projection"] = proj;
+            glBindVertexArray(modelObj->VAO);
+            glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+        }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
     }
 
-    // 2. draw actual scene
-    // draw light
-    scene[0]->progs[0]->Bind();
-    (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
-    (*scene[0]->progs[0])["view"] = view;
-    (*scene[0]->progs[0])["projection"] = proj;
-    (*scene[0]->progs[0])["cameraWorldSpacePos"] = camera.getPosition();
-    glBindVertexArray(scene[0]->VAO);
-    glDrawElements(GL_TRIANGLES, scene[0]->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
-
-
-    // draw all other models
-    for (int i=1;i<scene.size();i++) {
-        shared_ptr<Object> modelObj = scene[i];
-        modelObj->progs[AOMode]->Bind();
-        (*modelObj->progs[AOMode])["model"] = modelObj->modelMatrix;
-        (*modelObj->progs[AOMode])["view"] = view;
-        (*modelObj->progs[AOMode])["projection"] = proj;
-        (*modelObj->progs[AOMode])["cameraWorldSpacePos"] = camera.getPosition();
-        glBindVertexArray(modelObj->VAO);
-        glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
-    }
     glutSwapBuffers();
 }
 
