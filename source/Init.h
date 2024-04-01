@@ -76,7 +76,7 @@ namespace Init {
     void keyboard(unsigned char key, int x, int y) {
         if (key == 27) {  // ASCII value for the Esc key
             glutLeaveMainLoop();
-        } else if (key == 'n' || key == 'N') { 
+        } else if (key == 'o' || key == 'O') { 
             AOMode = 0;
             cout << "Switched to no ambient light mode." << endl;
         } else if (key == 'c' || key == 'C') { 
