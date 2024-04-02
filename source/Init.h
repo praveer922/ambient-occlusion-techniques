@@ -84,7 +84,7 @@ namespace Init {
             cout << "Switched to constant ambient light." << endl;
         } else if (key == 'h' || key == 'H') { 
             AOMode = 2;
-            cout << "Switched to SSAO+" << endl;
+            cout << "Switched to SSAO." << endl;
         }
         glutPostRedisplay();
     }

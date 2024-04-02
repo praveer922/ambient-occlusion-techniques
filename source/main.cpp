@@ -66,7 +66,7 @@ void display() {
         
         // render quad
         glClear(GL_COLOR_BUFFER_BIT);
-        planeObj->prog.Bind();
+        planeObj->ssaoProg.Bind();
         glBindVertexArray(planeObj->VAO);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);  
     }
@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
 
 
         // ssao geometry shader
-        modelObj->addProg("ssao+_geometry_vs.txt", "ssao+_geometry_fs.txt");
+        modelObj->addProg("ssao_depthmap_vs.txt", "ssao_depthmap_fs.txt");
     }
 
     //create depth map
@@ -159,7 +159,9 @@ int main(int argc, char** argv) {
 
 
     // set up plane
-    planeObj = make_shared<PlaneObject>(&PredefinedModels::quadVertices, "ssao+_lighting_vs.txt", "ssao+_lighting_fs.txt");
+    planeObj = make_shared<PlaneObject>(&PredefinedModels::quadVertices);
+    planeObj->depthMapProg.BuildFiles("ssao_depthscreen_vs.txt", "ssao_depthscreen_fs.txt");
+    planeObj->ssaoProg.BuildFiles("ssao_depthscreen_vs.txt", "ssao_fs.txt");
 
     glGenVertexArrays(1, &(planeObj->VAO)); 
     glBindVertexArray(planeObj->VAO);
@@ -172,7 +174,8 @@ int main(int argc, char** argv) {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    planeObj->prog["depthMap"] = 0;
+    planeObj->depthMapProg["depthMap"] = 0;
+    planeObj->ssaoProg["depthMap"] = 0;
 
 
     glutMainLoop();
