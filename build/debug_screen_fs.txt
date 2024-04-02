@@ -4,9 +4,10 @@ out vec4 FragColor;
 in vec2 TexCoords;
 
 uniform sampler2D viewSpacePos;
+uniform sampler2D ssaoTexture;
 
 
 void main()
 {             
-    FragColor = texture(viewSpacePos, TexCoords);
+    FragColor = vec4(vec3(texture(ssaoTexture, TexCoords).r), 1.0);
 }

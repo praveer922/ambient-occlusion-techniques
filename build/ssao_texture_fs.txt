@@ -1,5 +1,5 @@
 #version 330 core
-out vec4 FragColor;
+out float OcclusionValue;
 
 in vec2 TexCoords;
 
@@ -8,5 +8,11 @@ uniform sampler2D viewSpacePos;
 
 void main()
 {             
-    FragColor = texture(viewSpacePos, TexCoords);
+    vec3 fragPos = texture(viewSpacePos, TexCoords).xyz;
+    float occ = 0.0;
+    if (fragPos.z < 0) {
+        occ+=0.1;
+    }
+
+    OcclusionValue = occ;
 }

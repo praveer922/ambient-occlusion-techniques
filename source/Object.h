@@ -70,4 +70,5 @@ class PlaneObject : public Object {
     
     std::vector<float>* vertices; // Pointer to a vector of vertices
     cy::GLSLProgram debugScreen; 
+    cy::GLSLProgram ssaoTexture; 
 };
