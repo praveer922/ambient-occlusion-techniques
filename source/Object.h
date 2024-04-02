@@ -69,6 +69,5 @@ class PlaneObject : public Object {
     }
     
     std::vector<float>* vertices; // Pointer to a vector of vertices
-    cy::GLSLProgram depthMapProg; 
-    cy::GLSLProgram ssaoProg; 
+    cy::GLSLProgram debugScreen; 
 };

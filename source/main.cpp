@@ -65,7 +65,7 @@ void display() {
         
         // render quad
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        planeObj->depthMapProg.Bind();
+        planeObj->debugScreen.Bind();
         glBindVertexArray(planeObj->VAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
 
 
         // ssao geometry shader
-        modelObj->addProg("ssao_depthmap_vs.txt", "ssao_depthmap_fs.txt");
+        modelObj->addProg("ssao_geometry_vs.txt", "ssao_geometry_fs.txt");
     }
 
     // set up framebuffer for rendering geometric information
@@ -167,8 +167,7 @@ int main(int argc, char** argv) {
 
     // set up plane
     planeObj = make_shared<PlaneObject>(&PredefinedModels::quadVertices);
-    planeObj->depthMapProg.BuildFiles("ssao_depthscreen_vs.txt", "ssao_depthscreen_fs.txt");
-    planeObj->ssaoProg.BuildFiles("ssao_depthscreen_vs.txt", "ssao_fs.txt");
+    planeObj->debugScreen.BuildFiles("debug_screen_vs.txt", "debug_screen_fs.txt");
 
     glGenVertexArrays(1, &(planeObj->VAO)); 
     glBindVertexArray(planeObj->VAO);
@@ -181,8 +180,7 @@ int main(int argc, char** argv) {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    planeObj->depthMapProg["viewSpacePos"] = 0;
-    planeObj->ssaoProg["viewSpacePos"] = 0;
+    planeObj->debugScreen["viewSpacePos"] = 0;
 
 
     glutMainLoop();

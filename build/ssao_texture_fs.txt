@@ -8,6 +8,5 @@ uniform sampler2D viewSpacePos;
 
 void main()
 {             
-    float depthValue = texture(viewSpacePos, TexCoords).r;
-    FragColor = vec4(vec3(depthValue), 1.0);
+    FragColor = texture(viewSpacePos, TexCoords);
 }
