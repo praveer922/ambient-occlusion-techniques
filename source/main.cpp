@@ -16,17 +16,16 @@ using namespace std;
 Camera camera;
 vector<shared_ptr<Object>> scene;
 shared_ptr<PlaneObject> planeObj;
-GLuint depthMapFBO;
-GLuint depthMapTexture;
+GLuint gbuffer;
+GLuint viewSpacePosTexture;
 int AOMode = 0;
 
 void display() { 
     cy::Matrix4f view = camera.getLookAtMatrix();
     cy::Matrix4f proj = camera.getProjectionMatrix();
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     if (AOMode <= 1) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // draw light
         scene[0]->progs[0]->Bind();
         (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
@@ -51,8 +50,8 @@ void display() {
     } else if (AOMode > 1) {
         // 1. geometry pass: render scene's geometry/color data into gbuffer
         // -----------------------------------------------------------------
-        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-        glClear(GL_DEPTH_BUFFER_BIT);
+        glBindFramebuffer(GL_FRAMEBUFFER, gbuffer);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         for (int i=1;i<scene.size();i++) {
             shared_ptr<Object> modelObj = scene[i];
             modelObj->progs[2]->Bind();
@@ -65,9 +64,10 @@ void display() {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         
         // render quad
-        glClear(GL_COLOR_BUFFER_BIT);
-        planeObj->ssaoProg.Bind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        planeObj->depthMapProg.Bind();
         glBindVertexArray(planeObj->VAO);
+        glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);  
     }
 
@@ -137,25 +137,22 @@ int main(int argc, char** argv) {
         modelObj->addProg("ssao_depthmap_vs.txt", "ssao_depthmap_fs.txt");
     }
 
-    //create depth map
-    glGenFramebuffers(1, &depthMapFBO);  
-    glGenTextures(1, &depthMapTexture);
+    // set up framebuffer for rendering geometric information
+    glGenFramebuffers(1, &gbuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, gbuffer);
+    glGenTextures(1, &viewSpacePosTexture);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, depthMapTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, 
-                800, 600, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 800, 600, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);  
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, viewSpacePosTexture, 0);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMapTexture, 0);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);  
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "Framebuffer not complete!" << std::endl;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
     // set up plane
@@ -174,8 +171,8 @@ int main(int argc, char** argv) {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    planeObj->depthMapProg["depthMap"] = 0;
-    planeObj->ssaoProg["depthMap"] = 0;
+    planeObj->depthMapProg["viewSpacePos"] = 0;
+    planeObj->ssaoProg["viewSpacePos"] = 0;
 
 
     glutMainLoop();
