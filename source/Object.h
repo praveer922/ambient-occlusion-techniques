@@ -61,3 +61,14 @@ public:
         progs.push_back(newProg);
     }
 };
+
+class PlaneObject : public Object {
+    public:
+    PlaneObject(std::vector<float>* vertices, const std::string& vsFile, const std::string& fsFile) 
+        : vertices(vertices) {
+            prog.BuildFiles(vsFile.c_str(),fsFile.c_str());
+    }
+    
+    std::vector<float>* vertices; // Pointer to a vector of vertices
+    cy::GLSLProgram prog; 
+};
