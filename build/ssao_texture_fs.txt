@@ -4,6 +4,7 @@ out float OcclusionValue;
 in vec2 TexCoords;
 
 uniform sampler2D viewSpacePos;
+uniform vec3 samples[64];
 
 
 void main()
@@ -14,5 +15,11 @@ void main()
         occ+=0.1;
     }
 
-    OcclusionValue = occ;
+    float avg;
+    for (int i=0;i<64;i++) {
+        avg+= samples[i].x;
+    }
+    avg = avg/64;
+
+    OcclusionValue = avg;
 }

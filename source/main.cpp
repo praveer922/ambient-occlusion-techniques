@@ -10,6 +10,7 @@
 #include "Init.h"
 #include <memory>
 #include <iostream>
+#include <random>
 
 using namespace std;
 
@@ -21,6 +22,7 @@ GLuint viewSpacePosTexture;
 unsigned int ssaoFBO, ssaoBlurFBO;
 unsigned int ssaoColorBuffer, ssaoColorBufferBlur;
 int AOMode = 0;
+vector<cy::Vec3f> sphere_samples;
 
 void display() { 
     cy::Matrix4f view = camera.getLookAtMatrix();
@@ -88,6 +90,32 @@ void display() {
     }
 
     glutSwapBuffers();
+}
+
+
+std::vector<cy::Vec3f> generateSphereSamples(float radius) {
+    std::vector<cy::Vec3f> samples;
+    
+    // Define the random number generator
+    std::mt19937 rng(std::random_device{}());
+    std::uniform_real_distribution<float> dist(-radius, radius);
+
+    // Generate points within the bounding box and keep only those within the sphere
+    while (samples.size() < 64) {
+        // Generate random coordinates within the bounding box
+        float x = dist(rng);
+        float y = dist(rng);
+        float z = dist(rng);
+
+        // Check if the generated point is within the sphere
+        float distanceSquared = x * x + y * y + z * z;
+        if (distanceSquared <= radius * radius) {
+            // Add the point to the samples vector
+            samples.push_back(cy::Vec3f(x, y, z));
+        }
+    }
+
+    return samples;
 }
 
 
@@ -215,6 +243,16 @@ int main(int argc, char** argv) {
     planeObj->debugScreen["viewSpacePos"] = 0;
     planeObj->debugScreen["ssaoTexture"] = 1;
 
+    // generate samples in a unit sphere
+    sphere_samples = generateSphereSamples(0.5);
+    for (int i =0;i<64;i++) {
+        cout << "sample: " << sphere_samples[i].x << "," << sphere_samples[i].y << "," << sphere_samples[i].z << endl;
+    }
+    for (int i=0;i<64;i++) {
+        GLint sampleLocation = glGetUniformLocation(planeObj->ssaoTexture.GetID(), ("samples[" + std::to_string(i) + "]").c_str());
+        glUniform3f(sampleLocation, sphere_samples[i].x, sphere_samples[i].y, sphere_samples[i].z); 
+    }
+    
 
     glutMainLoop();
 
