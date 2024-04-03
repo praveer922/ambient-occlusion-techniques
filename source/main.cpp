@@ -243,15 +243,16 @@ int main(int argc, char** argv) {
     planeObj->debugScreen["viewSpacePos"] = 0;
     planeObj->debugScreen["ssaoTexture"] = 1;
 
-    // generate samples in a unit sphere
+    // generate samples in a unit sphere and send them to fragment shader
     sphere_samples = generateSphereSamples(0.5);
-    for (int i =0;i<64;i++) {
-        cout << "sample: " << sphere_samples[i].x << "," << sphere_samples[i].y << "," << sphere_samples[i].z << endl;
+    std::vector<float> flattenedData;
+    for (const auto& vec : sphere_samples) {
+        flattenedData.push_back(vec.x);
+        flattenedData.push_back(vec.y);
+        flattenedData.push_back(vec.z);
     }
-    for (int i=0;i<64;i++) {
-        GLint sampleLocation = glGetUniformLocation(planeObj->ssaoTexture.GetID(), ("samples[" + std::to_string(i) + "]").c_str());
-        glUniform3f(sampleLocation, sphere_samples[i].x, sphere_samples[i].y, sphere_samples[i].z); 
-    }
+    planeObj->ssaoTexture.Bind();
+    glUniform3fv(glGetUniformLocation(planeObj->ssaoTexture.GetID(), "samples"), sphere_samples.size(), flattenedData.data()); 
     
 
     glutMainLoop();

@@ -15,11 +15,5 @@ void main()
         occ+=0.1;
     }
 
-    float avg;
-    for (int i=0;i<64;i++) {
-        avg+= samples[i].x;
-    }
-    avg = avg/64;
-
-    OcclusionValue = avg;
+    OcclusionValue = abs(samples[0].x);
 }
