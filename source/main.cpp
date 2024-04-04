@@ -72,6 +72,7 @@ void display() {
         glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
         glClear(GL_COLOR_BUFFER_BIT);
         planeObj->ssaoTexture.Bind();
+        planeObj->ssaoTexture["projection"] = proj;
         glBindVertexArray(planeObj->VAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);

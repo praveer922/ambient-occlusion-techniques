@@ -4,16 +4,31 @@ out float OcclusionValue;
 in vec2 TexCoords;
 
 uniform sampler2D viewSpacePos;
+uniform mat4 projection;
 uniform vec3 samples[64];
 
+float bias = 0.025;
 
 void main()
 {             
     vec3 fragPos = texture(viewSpacePos, TexCoords).xyz;
-    float occ = 0.0;
-    if (fragPos.z < 0) {
-        occ+=0.1;
+    float occlusion = 0.0;
+    
+    for (int i=0;i<64;i++) {
+        vec3 samplePos = fragPos + samples[i];
+
+        // project sample view space position to screen position
+        vec4 offset = vec4(samplePos, 1.0);
+        offset = projection * offset;
+        offset.xyz /= offset.w;
+        offset.xyz = offset.xyz * 0.5 + 0.5;
+
+        float sampleDepth = texture(viewSpacePos, offset.xy).z;
+
+        float rangeCheck = smoothstep(0.0, 1.0, 0.5 / abs(fragPos.z - sampleDepth));
+        occlusion += (sampleDepth >= samplePos.z + bias ? 1.0 : 0.0) * rangeCheck; 
+
     }
 
-    OcclusionValue = abs(samples[0].x);
+    OcclusionValue = 1.0 - (occlusion / 64);
 }
