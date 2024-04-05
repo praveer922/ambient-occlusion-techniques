@@ -3,12 +3,15 @@
 #include <GL/freeglut.h>
 #include <memory>
 #include "PredefinedModels.h"
+#include <random>
 
 
 using namespace std;
 
 extern int AOMode;
 extern bool AO_ONLY_MODE;
+extern float sample_sphere_radius;
+extern shared_ptr<PlaneObject> planeObj;
 
 namespace Init {
     float lastX = 400, lastY = 300;
@@ -74,6 +77,39 @@ namespace Init {
         return modelObj;
     }
 
+    
+    void setSphereSamples(float radius) {
+        std::vector<cy::Vec3f> samples;
+        
+        // Define the random number generator
+        std::mt19937 rng(std::random_device{}());
+        std::uniform_real_distribution<float> dist(-radius, radius);
+
+        // Generate points within the bounding box and keep only those within the sphere
+        while (samples.size() < 64) {
+            // Generate random coordinates within the bounding box
+            float x = dist(rng);
+            float y = dist(rng);
+            float z = dist(rng);
+
+            // Check if the generated point is within the sphere
+            float distanceSquared = x * x + y * y + z * z;
+            if (distanceSquared <= radius * radius) {
+                // Add the point to the samples vector
+                samples.push_back(cy::Vec3f(x, y, z));
+            }
+        }
+
+        std::vector<float> flattenedData;
+        for (const auto& vec : samples) {
+            flattenedData.push_back(vec.x);
+            flattenedData.push_back(vec.y);
+            flattenedData.push_back(vec.z);
+        }
+        planeObj->ssaoTexture.Bind();
+        glUniform3fv(glGetUniformLocation(planeObj->ssaoTexture.GetID(), "samples"), samples.size(), flattenedData.data()); 
+    }
+
     void keyboard(unsigned char key, int x, int y) {
         if (key == 27) {  // ASCII value for the Esc key
             glutLeaveMainLoop();
@@ -92,6 +128,25 @@ namespace Init {
         }
         glutPostRedisplay();
     }
+
+    void specialKeys(int key, int x, int y) {
+        switch (key) {
+            case GLUT_KEY_UP:
+                sample_sphere_radius += 0.1f;
+                break;
+            case GLUT_KEY_DOWN:
+                sample_sphere_radius -= 0.1f;
+                if (sample_sphere_radius < 0.1) {
+                    sample_sphere_radius = 0.0;
+                }
+                break;
+            // Add cases for other arrow keys if needed
+        }
+        cout << "Sample sphere radius is now " << sample_sphere_radius << "." << endl;
+        setSphereSamples(sample_sphere_radius);
+        glutPostRedisplay();
+    }
+
 
     void handleMouse(int button, int state, int x, int y) {
         if (button == GLUT_LEFT_BUTTON) {
@@ -120,6 +175,7 @@ namespace Init {
         glutKeyboardFunc(keyboard);
         glutMouseFunc(handleMouse);
         glutMotionFunc(mouseMotion);
+        glutSpecialFunc(specialKeys); 
     }
 
     void initCamera(Camera * camera) {

@@ -8,6 +8,7 @@ uniform mat4 projection;
 uniform vec3 samples[64];
 
 float bias = 0.025;
+uniform float radius;
 
 void main()
 {             
@@ -25,7 +26,7 @@ void main()
 
         float sampleDepth = texture(viewSpacePos, offset.xy).z;
 
-        float rangeCheck = smoothstep(0.0, 1.0, 0.5 / abs(fragPos.z - sampleDepth));
+        float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleDepth));
         occlusion += (sampleDepth >= samplePos.z + bias ? 1.0 : 0.0) * rangeCheck; 
 
     }

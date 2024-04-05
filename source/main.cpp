@@ -10,7 +10,6 @@
 #include "Init.h"
 #include <memory>
 #include <iostream>
-#include <random>
 
 using namespace std;
 
@@ -21,10 +20,10 @@ GLuint gbuffer;
 GLuint viewSpacePosTexture;
 unsigned int ssaoFBO, ssaoBlurFBO;
 unsigned int ssaoColorBuffer, ssaoColorBufferBlur;
-vector<cy::Vec3f> sphere_samples;
 
 int AOMode = 0;
 bool AO_ONLY_MODE = false;
+float sample_sphere_radius = 0.5;
 
 void display() { 
     cy::Matrix4f view = camera.getLookAtMatrix();
@@ -73,15 +72,17 @@ void display() {
         glClear(GL_COLOR_BUFFER_BIT);
         planeObj->ssaoTexture.Bind();
         planeObj->ssaoTexture["projection"] = proj;
+        planeObj->ssaoTexture["radius"] = sample_sphere_radius;
         glBindVertexArray(planeObj->VAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         if (!AO_ONLY_MODE) {
             // 3. final render with AO applied
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
             // draw light
@@ -119,32 +120,6 @@ void display() {
     }
 
     glutSwapBuffers();
-}
-
-
-std::vector<cy::Vec3f> generateSphereSamples(float radius) {
-    std::vector<cy::Vec3f> samples;
-    
-    // Define the random number generator
-    std::mt19937 rng(std::random_device{}());
-    std::uniform_real_distribution<float> dist(-radius, radius);
-
-    // Generate points within the bounding box and keep only those within the sphere
-    while (samples.size() < 64) {
-        // Generate random coordinates within the bounding box
-        float x = dist(rng);
-        float y = dist(rng);
-        float z = dist(rng);
-
-        // Check if the generated point is within the sphere
-        float distanceSquared = x * x + y * y + z * z;
-        if (distanceSquared <= radius * radius) {
-            // Add the point to the samples vector
-            samples.push_back(cy::Vec3f(x, y, z));
-        }
-    }
-
-    return samples;
 }
 
 
@@ -284,16 +259,7 @@ int main(int argc, char** argv) {
     planeObj->debugScreen["ssaoTexture"] = 1;
 
     // generate samples in a unit sphere and send them to fragment shader
-    sphere_samples = generateSphereSamples(0.5);
-    std::vector<float> flattenedData;
-    for (const auto& vec : sphere_samples) {
-        flattenedData.push_back(vec.x);
-        flattenedData.push_back(vec.y);
-        flattenedData.push_back(vec.z);
-    }
-    planeObj->ssaoTexture.Bind();
-    glUniform3fv(glGetUniformLocation(planeObj->ssaoTexture.GetID(), "samples"), sphere_samples.size(), flattenedData.data()); 
-    
+    Init::setSphereSamples(sample_sphere_radius);
 
     glutMainLoop();
 
