@@ -8,6 +8,7 @@
 using namespace std;
 
 extern int AOMode;
+extern bool AO_ONLY_MODE;
 
 namespace Init {
     float lastX = 400, lastY = 300;
@@ -85,6 +86,9 @@ namespace Init {
         } else if (key == 's' || key == 'S') { 
             AOMode = 2;
             cout << "Switched to SSAO." << endl;
+        } else if (key == 't' || key == 'T') { 
+            AO_ONLY_MODE = !AO_ONLY_MODE;
+            cout << "Toggled AO ONLY mode." << endl;
         }
         glutPostRedisplay();
     }

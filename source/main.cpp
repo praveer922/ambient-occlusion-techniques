@@ -21,8 +21,10 @@ GLuint gbuffer;
 GLuint viewSpacePosTexture;
 unsigned int ssaoFBO, ssaoBlurFBO;
 unsigned int ssaoColorBuffer, ssaoColorBufferBlur;
-int AOMode = 0;
 vector<cy::Vec3f> sphere_samples;
+
+int AOMode = 0;
+bool AO_ONLY_MODE = false;
 
 void display() { 
     cy::Matrix4f view = camera.getLookAtMatrix();
@@ -76,40 +78,44 @@ void display() {
         glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        
-        // 3. final render with AO applied
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-        // draw light
-        scene[0]->progs[0]->Bind();
-        (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
-        (*scene[0]->progs[0])["view"] = view;
-        (*scene[0]->progs[0])["projection"] = proj;
-        glBindVertexArray(scene[0]->VAO);
-        glDrawElements(GL_TRIANGLES, scene[0]->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+
+        if (!AO_ONLY_MODE) {
+            // 3. final render with AO applied
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            // draw light
+            scene[0]->progs[0]->Bind();
+            (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
+            (*scene[0]->progs[0])["view"] = view;
+            (*scene[0]->progs[0])["projection"] = proj;
+            glBindVertexArray(scene[0]->VAO);
+            glDrawElements(GL_TRIANGLES, scene[0]->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
 
 
-        // draw all other models
-        for (int i=1;i<scene.size();i++) {
-            shared_ptr<Object> modelObj = scene[i];
-            modelObj->progs[3]->Bind();
-            (*modelObj->progs[3])["model"] = modelObj->modelMatrix;
-            (*modelObj->progs[3])["view"] = view;
-            (*modelObj->progs[3])["projection"] = proj;
-            glBindVertexArray(modelObj->VAO);
-            glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+            // draw all other models
+            for (int i=1;i<scene.size();i++) {
+                shared_ptr<Object> modelObj = scene[i];
+                modelObj->progs[3]->Bind();
+                (*modelObj->progs[3])["model"] = modelObj->modelMatrix;
+                (*modelObj->progs[3])["view"] = view;
+                (*modelObj->progs[3])["projection"] = proj;
+                glBindVertexArray(modelObj->VAO);
+                glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+            }
+        } else {
+            planeObj->debugScreen.Bind();
+            glBindVertexArray(planeObj->VAO);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
+        
 
-        /* debug screen
-        planeObj->debugScreen.Bind();
-        glBindVertexArray(planeObj->VAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        */
+
+
     }
 
     glutSwapBuffers();
@@ -312,8 +318,9 @@ Program controls:
 
 o -- No Ambient Occlusion [done]
 c -- constant ambient lighting [done]
-s -- screen space ao (ssao)
+s -- screen space ao (ssao) 
 h -- normal-based hemisphere AO (ssao+)
 n -- neural network ambient occlusion
+t -- toggle AO only mode
 
 */
