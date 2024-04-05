@@ -37,8 +37,8 @@ void main()
     screenCoords.xyz /= screenCoords.w;
     screenCoords.xyz = screenCoords.xyz * 0.5 + 0.5;
     // get occlusion value
-    float occlusion = texture(ssaoTexture, screenCoords.xy).z;
-    vec3 ambient = Ka * occlusion;
+    float occlusion = texture(ssaoTexture, screenCoords.xy).r;
+    vec3 ambient =ambientStr * Ka * occlusion;
 
     // diffuse light 
     vec3 normalizedNormal = normalize(normalPos);

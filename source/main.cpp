@@ -35,7 +35,6 @@ void display() {
         (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
         (*scene[0]->progs[0])["view"] = view;
         (*scene[0]->progs[0])["projection"] = proj;
-        (*scene[0]->progs[0])["cameraWorldSpacePos"] = camera.getPosition();
         glBindVertexArray(scene[0]->VAO);
         glDrawElements(GL_TRIANGLES, scene[0]->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
 
@@ -47,7 +46,6 @@ void display() {
             (*modelObj->progs[AOMode])["model"] = modelObj->modelMatrix;
             (*modelObj->progs[AOMode])["view"] = view;
             (*modelObj->progs[AOMode])["projection"] = proj;
-            (*modelObj->progs[AOMode])["cameraWorldSpacePos"] = camera.getPosition();
             glBindVertexArray(modelObj->VAO);
             glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
         }
@@ -81,12 +79,13 @@ void display() {
         
         // 3. final render with AO applied
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
         // draw light
         scene[0]->progs[0]->Bind();
         (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
         (*scene[0]->progs[0])["view"] = view;
         (*scene[0]->progs[0])["projection"] = proj;
-        (*scene[0]->progs[0])["cameraWorldSpacePos"] = camera.getPosition();
         glBindVertexArray(scene[0]->VAO);
         glDrawElements(GL_TRIANGLES, scene[0]->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
 
@@ -98,7 +97,6 @@ void display() {
             (*modelObj->progs[3])["model"] = modelObj->modelMatrix;
             (*modelObj->progs[3])["view"] = view;
             (*modelObj->progs[3])["projection"] = proj;
-            (*modelObj->progs[3])["cameraWorldSpacePos"] = camera.getPosition();
             glBindVertexArray(modelObj->VAO);
             glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
         }
