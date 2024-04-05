@@ -82,7 +82,7 @@ namespace Init {
         } else if (key == 'c' || key == 'C') { 
             AOMode = 1;
             cout << "Switched to constant ambient light." << endl;
-        } else if (key == 'h' || key == 'H') { 
+        } else if (key == 's' || key == 'S') { 
             AOMode = 2;
             cout << "Switched to SSAO." << endl;
         }

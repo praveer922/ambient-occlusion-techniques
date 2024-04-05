@@ -79,15 +79,39 @@ void display() {
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         
-        // render quad
+        // 3. final render with AO applied
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // draw light
+        scene[0]->progs[0]->Bind();
+        (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
+        (*scene[0]->progs[0])["view"] = view;
+        (*scene[0]->progs[0])["projection"] = proj;
+        (*scene[0]->progs[0])["cameraWorldSpacePos"] = camera.getPosition();
+        glBindVertexArray(scene[0]->VAO);
+        glDrawElements(GL_TRIANGLES, scene[0]->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+
+
+        // draw all other models
+        for (int i=1;i<scene.size();i++) {
+            shared_ptr<Object> modelObj = scene[i];
+            modelObj->progs[3]->Bind();
+            (*modelObj->progs[3])["model"] = modelObj->modelMatrix;
+            (*modelObj->progs[3])["view"] = view;
+            (*modelObj->progs[3])["projection"] = proj;
+            (*modelObj->progs[3])["cameraWorldSpacePos"] = camera.getPosition();
+            glBindVertexArray(modelObj->VAO);
+            glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+        }
+
+        /* debug screen
         planeObj->debugScreen.Bind();
         glBindVertexArray(planeObj->VAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);  
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        */
     }
 
     glutSwapBuffers();
@@ -180,6 +204,15 @@ int main(int argc, char** argv) {
 
         // ssao geometry shader
         modelObj->addProg("ssao_geometry_vs.txt", "ssao_geometry_fs.txt");
+
+        // ssao lighting shader
+        modelObj->addProg("vs.txt", "ssao_lighting_fs.txt");
+        (*modelObj->progs[3])["Ka"] = cy::Vec3f(modelObj->mesh.M(0).Ka[0],modelObj->mesh.M(0).Ka[1],modelObj->mesh.M(0).Ka[2]);
+        (*modelObj->progs[3])["Kd"] = cy::Vec3f(modelObj->mesh.M(0).Kd[0], modelObj->mesh.M(0).Kd[1], modelObj->mesh.M(0).Kd[2]);
+        (*modelObj->progs[3])["Ks"] = cy::Vec3f(modelObj->mesh.M(0).Ks[0],modelObj->mesh.M(0).Ks[1],modelObj->mesh.M(0).Ks[2]);
+        (*modelObj->progs[3])["Ns"] = modelObj->mesh.M(0).Ns;
+        (*modelObj->progs[3])["lightColor"] = cy::Vec3f(1.0f,1.0f,1.0f);
+        (*modelObj->progs[3])["lightPos"] = lightPos;
     }
 
     // set up framebuffer for rendering geometric information
@@ -268,10 +301,8 @@ AOMode progs indexes:
 
 0 -- no ambient light
 1 -- constant ambient light
-2 -- ssao+ geometry shader (for rendering geometric info into gbuffer)
-3 -- ssao+ shader (uses Gbuffer to render SSAO texture)
-4 -- ssao+ lighting pass (use ssao texture to do final render)
-
+2 -- ssao geometry shader (for rendering geometric info into gbuffer)
+3 -- ssao lighting shader (final render that applies the ssao texture)
 */
 
 
