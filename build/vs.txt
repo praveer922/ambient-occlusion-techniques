@@ -6,12 +6,16 @@ layout(location=1) in vec3 inNormal;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform vec3 lightPos;
 
 out vec3 normalPos;
-out vec3 worldSpacePos;
+out vec3 fragViewPos;
+out vec3 lightViewPos;
 
 void main() {
-    gl_Position = projection * view * model * vec4(pos, 1);
+    vec4 viewPos = view * model * vec4(pos, 1);
+    fragViewPos = vec3(viewPos);
     normalPos = mat3(transpose(inverse(model))) * inNormal;
-    worldSpacePos = vec3(model * vec4(pos,1));
+    lightViewPos = vec3(view * vec4(lightPos,1.0));
+    gl_Position = projection * viewPos;
 }

@@ -213,6 +213,8 @@ int main(int argc, char** argv) {
         (*modelObj->progs[3])["Ns"] = modelObj->mesh.M(0).Ns;
         (*modelObj->progs[3])["lightColor"] = cy::Vec3f(1.0f,1.0f,1.0f);
         (*modelObj->progs[3])["lightPos"] = lightPos;
+        (*modelObj->progs[3])["viewSpacePos"] = 0;
+        (*modelObj->progs[3])["ssaoTexture"] = 1;
     }
 
     // set up framebuffer for rendering geometric information
