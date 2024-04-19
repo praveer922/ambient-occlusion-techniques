@@ -110,6 +110,38 @@ namespace Init {
         glUniform3fv(glGetUniformLocation(planeObj->ssaoTexture.GetID(), "samples"), samples.size(), flattenedData.data()); 
     }
 
+    void setHemiSphereSamples(float radius) {
+        std::vector<cy::Vec3f> samples;
+        
+        // Define the random number generator
+        std::mt19937 rng(std::random_device{}());
+        std::uniform_real_distribution<float> distxz(-1.0, 1.0);
+        std::uniform_real_distribution<float> disty(0, 1.0);
+
+        // Generate points within the bounding box and keep only those within the sphere
+        while (samples.size() < 64) {
+            // Generate random coordinates within the bounding box
+            float x = distxz(rng);
+            float y = disty(rng);
+            float z = distxz(rng);
+
+            // Check if the generated point is within the hemisphere
+            if (x * x + y * y + z * z <= 1) {
+                // Add the point to the samples vector
+                samples.push_back(cy::Vec3f(x*radius, y*radius, z*radius));
+            }
+        }
+
+        std::vector<float> flattenedData;
+        for (const auto& vec : samples) {
+            flattenedData.push_back(vec.x);
+            flattenedData.push_back(vec.y);
+            flattenedData.push_back(vec.z);
+        }
+        planeObj->ssaoPlusTexture.Bind();
+        glUniform3fv(glGetUniformLocation(planeObj->ssaoPlusTexture.GetID(), "samples"), samples.size(), flattenedData.data()); 
+    }
+
     void keyboard(unsigned char key, int x, int y) {
         if (key == 27) {  // ASCII value for the Esc key
             glutLeaveMainLoop();
@@ -122,10 +154,13 @@ namespace Init {
         } else if (key == 's' || key == 'S') { 
             AOMode = 2;
             cout << "Switched to SSAO." << endl;
+        } else if (key == 'h' || key == 'H') { 
+            AOMode = 3;
+            cout << "Switched to SSAO+." << endl;
         } else if (key == 't' || key == 'T') { 
             AO_ONLY_MODE = !AO_ONLY_MODE;
             cout << "Toggled AO ONLY mode." << endl;
-        }
+        } 
         glutPostRedisplay();
     }
 

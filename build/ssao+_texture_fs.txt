@@ -1,0 +1,50 @@
+#version 330 core
+out float OcclusionValue;
+
+in vec2 TexCoords;
+
+uniform sampler2D viewSpacePos;
+uniform sampler2D gNormal;
+uniform mat4 projection;
+uniform vec3 samples[64];
+
+float bias = 0.05;
+uniform float radius;
+
+void main()
+{             
+    vec3 fragPos = texture(viewSpacePos, TexCoords).xyz;
+    vec3 normal = texture(gNormal, TexCoords).xyz;
+    float occlusion = 0.0;
+
+    // rotate sample hemisphere to center around normal 
+    normal = normalize(normal);
+    // Calculate rotation axis and angle
+    vec3 axis = cross(vec3(0, 1, 0), normal);
+    float angle = acos(dot(vec3(0, 1, 0), normal));
+    // Calculate rotation matrix using Rodrigues' rotation formula
+    mat3 k = mat3(0, -axis.z, axis.y,
+                   axis.z, 0, -axis.x,
+                  -axis.y, axis.x, 0);
+    mat3 rotation_matrix = mat3(1.0) + sin(angle) * k + (1.0 - cos(angle)) * k * k;
+
+
+    for (int i=0;i<64;i++) {
+        vec3 rotated_sample = rotation_matrix * samples[i];
+        vec3 samplePos = fragPos + rotated_sample;
+
+        // project sample view space position to screen position
+        vec4 offset = vec4(samplePos, 1.0);
+        offset = projection * offset;
+        offset.xyz /= offset.w;
+        offset.xyz = offset.xyz * 0.5 + 0.5;
+
+        float sampleDepth = texture(viewSpacePos, offset.xy).z;
+
+        float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleDepth));
+        occlusion += (sampleDepth >= samplePos.z + bias ? 1.0 : 0.0) * rangeCheck; 
+
+    }
+
+    OcclusionValue = 1.0 - (occlusion / 64);
+}

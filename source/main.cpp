@@ -17,7 +17,7 @@ Camera camera;
 vector<shared_ptr<Object>> scene;
 shared_ptr<PlaneObject> planeObj;
 GLuint gbuffer;
-GLuint viewSpacePosTexture;
+GLuint viewSpacePosTexture, gNormal;
 unsigned int ssaoFBO, ssaoBlurFBO;
 unsigned int ssaoColorBuffer, ssaoColorBufferBlur;
 
@@ -50,7 +50,7 @@ void display() {
             glBindVertexArray(modelObj->VAO);
             glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
         }
-    } else if (AOMode > 1) {
+    } else if (AOMode == 2) { //SSAO
         // 1. geometry pass: render scene's geometry/color data into gbuffer
         // -----------------------------------------------------------------
         glBindFramebuffer(GL_FRAMEBUFFER, gbuffer);
@@ -113,9 +113,73 @@ void display() {
             glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
+    } else if (AOMode == 3) { // SSAO+ 
+        // 1. geometry pass: render scene's geometry/normal data into gbuffer
+        // -----------------------------------------------------------------
+        glBindFramebuffer(GL_FRAMEBUFFER, gbuffer);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        for (int i=1;i<scene.size();i++) {
+            shared_ptr<Object> modelObj = scene[i];
+            modelObj->progs[4]->Bind();
+            (*modelObj->progs[4])["model"] = modelObj->modelMatrix;
+            (*modelObj->progs[4])["view"] = view;
+            (*modelObj->progs[4])["projection"] = proj;
+            glBindVertexArray(modelObj->VAO);
+            glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         
+        // 2. generate SSAO+ texture
+        // ------------------------
+        glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+        glClear(GL_COLOR_BUFFER_BIT);
+        planeObj->ssaoPlusTexture.Bind();
+        planeObj->ssaoPlusTexture["projection"] = proj;
+        planeObj->ssaoPlusTexture["radius"] = sample_sphere_radius;
+        glBindVertexArray(planeObj->VAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, gNormal);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+          // 3. final render with AO applied
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        if (!AO_ONLY_MODE) {
+            // 3. final render with AO applied
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            // draw light
+            scene[0]->progs[0]->Bind();
+            (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
+            (*scene[0]->progs[0])["view"] = view;
+            (*scene[0]->progs[0])["projection"] = proj;
+            glBindVertexArray(scene[0]->VAO);
+            glDrawElements(GL_TRIANGLES, scene[0]->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
 
 
+            // draw all other models
+            for (int i=1;i<scene.size();i++) {
+                shared_ptr<Object> modelObj = scene[i];
+                modelObj->progs[3]->Bind();
+                (*modelObj->progs[3])["model"] = modelObj->modelMatrix;
+                (*modelObj->progs[3])["view"] = view;
+                (*modelObj->progs[3])["projection"] = proj;
+                glBindVertexArray(modelObj->VAO);
+                glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+            }
+        } else {
+            planeObj->debugScreen.Bind();
+            glBindVertexArray(planeObj->VAO);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, gNormal);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        }
 
     }
 
@@ -194,13 +258,16 @@ int main(int argc, char** argv) {
         (*modelObj->progs[3])["lightPos"] = lightPos;
         (*modelObj->progs[3])["viewSpacePos"] = 0;
         (*modelObj->progs[3])["ssaoTexture"] = 1;
+
+        // ssao+ geometry shader
+        modelObj->addProg("ssao+_geometry_vs.txt", "ssao+_geometry_fs.txt");
     }
 
     // set up framebuffer for rendering geometric information
     glGenFramebuffers(1, &gbuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, gbuffer);
+    // view space position buffer
     glGenTextures(1, &viewSpacePosTexture);
-    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, 800, 600, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -208,6 +275,13 @@ int main(int argc, char** argv) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, viewSpacePosTexture, 0);
+    // normal buffer
+    glGenTextures(1, &gNormal);
+    glBindTexture(GL_TEXTURE_2D, gNormal);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, 800, 600, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
 
     unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
     glDrawBuffers(3, attachments);
@@ -242,6 +316,7 @@ int main(int argc, char** argv) {
     planeObj = make_shared<PlaneObject>(&PredefinedModels::quadVertices);
     planeObj->debugScreen.BuildFiles("debug_screen_vs.txt", "debug_screen_fs.txt");
     planeObj->ssaoTexture.BuildFiles("ssao_texture_vs.txt", "ssao_texture_fs.txt");
+    planeObj->ssaoPlusTexture.BuildFiles("ssao+_texture_vs.txt", "ssao+_texture_fs.txt");
 
     glGenVertexArrays(1, &(planeObj->VAO)); 
     glBindVertexArray(planeObj->VAO);
@@ -255,11 +330,15 @@ int main(int argc, char** argv) {
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     planeObj->ssaoTexture["viewSpacePos"] = 0;
+    planeObj->ssaoPlusTexture["viewSpacePos"] = 0;
+    planeObj->ssaoPlusTexture["gNormal"] = 2;
     planeObj->debugScreen["viewSpacePos"] = 0;
     planeObj->debugScreen["ssaoTexture"] = 1;
+    planeObj->debugScreen["gNormal"] = 2;
 
     // generate samples in a unit sphere and send them to fragment shader
     Init::setSphereSamples(sample_sphere_radius);
+    Init::setHemiSphereSamples(sample_sphere_radius);
 
     glutMainLoop();
 
@@ -269,12 +348,13 @@ int main(int argc, char** argv) {
 
 /* 
 
-AOMode progs indexes:
+modelObj progs indexes:
 
 0 -- no ambient light
 1 -- constant ambient light
 2 -- ssao geometry shader (for rendering geometric info into gbuffer)
 3 -- ssao lighting shader (final render that applies the ssao texture)
+4 -- ssao+ geometry shader
 */
 
 
@@ -284,7 +364,7 @@ Program controls:
 
 o -- No Ambient Occlusion [done]
 c -- constant ambient lighting [done]
-s -- screen space ao (ssao) 
+s -- screen space ao (ssao) [done]
 h -- normal-based hemisphere AO (ssao+)
 n -- neural network ambient occlusion
 t -- toggle AO only mode

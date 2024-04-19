@@ -5,6 +5,7 @@ in vec2 TexCoords;
 
 uniform sampler2D viewSpacePos;
 uniform sampler2D ssaoTexture;
+uniform sampler2D gNormal;
 
 
 void main()
