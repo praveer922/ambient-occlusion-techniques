@@ -365,8 +365,8 @@ Program controls:
 o -- No Ambient Occlusion [done]
 c -- constant ambient lighting [done]
 s -- screen space ao (ssao) [done]
-h -- normal-based hemisphere AO (ssao+)
+h -- normal-based hemisphere AO (ssao+) [done]
 n -- neural network ambient occlusion
-t -- toggle AO only mode
+t -- toggle AO only mode [done]
 
 */
