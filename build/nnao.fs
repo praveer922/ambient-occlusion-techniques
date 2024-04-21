@@ -7,7 +7,7 @@
 #define HW ((FW-1)/2)
 
 /* Comment out to disable new sampling method */
-//#define SPIRAL_SAMPLER
+#define SPIRAL_SAMPLER
 
 #ifdef SPIRAL_SAMPLER
 //#define NSAMPLES 8
@@ -110,35 +110,25 @@ void main() {
   vec4 midl = texture2D(gNormal, fTexcoord);
   midl.a = viewPos.a;
 
-  vec3 base = camera_space(fTexcoord, midl.w);
+  vec3 base = viewPos.xyz;
   vec3 seed = rand(base);
   
   /* First Layer */
   
   vec4 H0 = vec4(0);
   
-#ifdef SPIRAL_SAMPLER
-  
   /* New Faster Sampler Method */
   for (int i = 0; i < NSAMPLES; i++) {    
     float scale = (PI/4) * (FW*FW) * ((float(i+1)/float(NSAMPLES+1))/(NSAMPLES/2));
-    vec2 indx = spiral(float(i+1)/float(NSAMPLES+1), 2.5, 2*PI*seed.x);
-    
-#else
+    vec2 indx = spiral(float(i+1)/float(NSAMPLES+1), 2.5, 2*PI*seed.x);  
 
-  /* Old Slower Sampler Method */
-  for (int i = -HW; i <= HW; i++)
-  for (int j = -HW; j <= HW; j++) {
-    if (mod(j+(i*(HW*2+1)), (((FW+1)*(FW+1))/NSAMPLES)+1) != 0) { continue; }
-    if (i*i+j*j > HW*HW) { continue; }
-    float scale = (((FW+1)*(FW+1))/NSAMPLES)+1;
-    vec2 indx = (vec2(i, j) + seed.xy) / HW;
-    
-#endif
-  
     vec4 next = cam_proj * vec4(base + radius * (vec3(indx, 0)), 1);
-    vec4 norm = texture2D(viewSpacePos, ((next.xy / next.w)+1)/2);    
-    vec3 actu = camera_space(((next.xy / next.w)+1)/2, norm.w);
+    // project sample view space position to screenspace
+    next.xyz /= next.w;
+    next.xyz = next.xyz*0.5 + 0.5;
+
+    vec4 norm = texture2D(gNormal, next.xy);    
+    vec3 actu = texture2D(viewSpacePos, next.xy).xyz;
     vec2 fltr = (indx * HW + HW + 0.5) / (HW*2+2);
     
     vec4 X = 
@@ -161,8 +151,6 @@ void main() {
   /* Output */
   
   gl_FragColor.rgb = 1.0-vec3(clamp(Y * Ystd + Ymean, 0.0, 1.0));
-  //gl_FragColor.rgb = pow(gl_FragColor.rgb, vec3(2.2)); // gamma to linear space
+  gl_FragColor.rgb = pow(gl_FragColor.rgb, vec3(2.2)); // gamma to linear space
 	gl_FragColor.a = 1.0;
-  // gl_FragColor.rbg = gl_FragColor.rbg - 0.98;
-  // gl_FragColor.rgb = gl_FragColor.rgb/0.02;
 } 
