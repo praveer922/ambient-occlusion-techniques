@@ -72,4 +72,5 @@ class PlaneObject : public Object {
     cy::GLSLProgram debugScreen; 
     cy::GLSLProgram ssaoTexture; 
     cy::GLSLProgram ssaoPlusTexture;
+    cy::GLSLProgram nnaoTexture;
 };

@@ -10,6 +10,7 @@
 #include "Init.h"
 #include <memory>
 #include <iostream>
+#include "SDL2/SDL.h"
 
 using namespace std;
 
@@ -24,6 +25,14 @@ unsigned int ssaoColorBuffer, ssaoColorBufferBlur;
 int AOMode = 0;
 bool AO_ONLY_MODE = false;
 float sample_sphere_radius = 0.5;
+
+enum {
+  FILTER_NUM  = 4,
+  FILTER_SIZE = 32,
+};
+
+static GLuint F_tex[FILTER_NUM];
+
 
 void display() { 
     cy::Matrix4f view = camera.getLookAtMatrix();
@@ -181,9 +190,116 @@ void display() {
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
 
+    } else if (AOMode == 4) { // NNAO
+        // 1. geometry pass: render scene's geometry/normal data into gbuffer
+        // -----------------------------------------------------------------
+        glBindFramebuffer(GL_FRAMEBUFFER, gbuffer);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        for (int i=1;i<scene.size();i++) {
+            shared_ptr<Object> modelObj = scene[i];
+            modelObj->progs[5]->Bind();
+            (*modelObj->progs[5])["model"] = modelObj->modelMatrix;
+            (*modelObj->progs[5])["view"] = view;
+            (*modelObj->progs[5])["projection"] = proj;
+            glBindVertexArray(modelObj->VAO);
+            glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // 2. generate NNAO texture
+        // ------------------------
+        glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+        glClear(GL_COLOR_BUFFER_BIT);
+        planeObj->nnaoTexture.Bind();
+        planeObj->nnaoTexture["cam_proj"] = proj;
+        planeObj->nnaoTexture["cam_inv_proj"] = proj.GetInverse();
+        planeObj->nnaoTexture["radius"] = sample_sphere_radius;
+        glBindVertexArray(planeObj->VAO);
+        // set gbuffer
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, gNormal);
+        // set filters
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, F_tex[0]);
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, F_tex[1]);
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, F_tex[2]);
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_2D, F_tex[3]);
+
+        //draw to texture
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // render debug screen
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        planeObj->debugScreen.Bind();
+        glBindVertexArray(planeObj->VAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, gNormal);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
     glutSwapBuffers();
+}
+
+static void load_tga(const char *filename, uint16_t *width, uint16_t *height, unsigned char **data) {
+  
+    SDL_RWops* file = SDL_RWFromFile(filename, "rb");
+  
+	if (file == NULL) {
+		printf("Cannot open file %s", filename);
+        exit(1);
+	}
+	
+    char depth;
+	SDL_RWseek(file, 12, SEEK_SET);
+	SDL_RWread(file, width, sizeof(uint16_t), 1);
+	SDL_RWseek(file, 14, SEEK_SET);
+	SDL_RWread(file, height, sizeof(uint16_t), 1);
+	SDL_RWseek(file, 16, SEEK_SET);
+	SDL_RWread(file, &depth, sizeof(char), 1);
+  
+	if (depth != 32) {
+		printf("tga file doesn't have four channels");
+        exit(1);
+    }
+  
+    *data = (unsigned char*)malloc(sizeof(unsigned char) * 4 * (*width) * (*height));
+  
+	SDL_RWseek(file, 18, SEEK_SET);
+	SDL_RWread(file, *data, sizeof(unsigned char) * 4 * (*width) * (*height), 1);
+    SDL_RWclose(file);
+    
+    for(int x = 0; x < *width; x++)
+    for(int y = 0; y < *height; y++) {
+        unsigned char t0, t1, t2, t3;
+        t0 = (*data)[x * 4 + y * (*width) * 4 + 2]; t1 = (*data)[x * 4 + y * (*width) * 4 + 1];
+        t2 = (*data)[x * 4 + y * (*width) * 4 + 0]; t3 = (*data)[x * 4 + y * (*width) * 4 + 3];
+        (*data)[x * 4 + y * (*width) * 4 + 0] = t0; (*data)[x * 4 + y * (*width) * 4 + 1] = t1; 
+        (*data)[x * 4 + y * (*width) * 4 + 2] = t2; (*data)[x * 4 + y * (*width) * 4 + 3] = t3;
+    }
+    
+    for (int x = 0; x < *width;      x++)
+    for (int y = 0; y < *height / 2; y++) {
+        unsigned char t0, t1, t2, t3, b0, b1, b2, b3;
+        t0 = (*data)[x * 4 + y * (*width) * 4 + 0]; t1 = (*data)[x * 4 + y * (*width) * 4 + 1];
+        t2 = (*data)[x * 4 + y * (*width) * 4 + 2]; t3 = (*data)[x * 4 + y * (*width) * 4 + 3];
+        b0 = (*data)[x * 4 + ((*height-1) - y) * (*width) * 4 + 0]; b1 = (*data)[x * 4 + ((*height-1) - y) * (*width) * 4 + 1];
+        b2 = (*data)[x * 4 + ((*height-1) - y) * (*width) * 4 + 2]; b3 = (*data)[x * 4 + ((*height-1) - y) * (*width) * 4 + 3];
+        (*data)[x * 4 + y * (*width) * 4 + 0] = b0; (*data)[x * 4 + y * (*width) * 4 + 1] = b1;
+        (*data)[x * 4 + y * (*width) * 4 + 2] = b2; (*data)[x * 4 + y * (*width) * 4 + 3] = b3;
+        (*data)[x * 4 + ((*height-1) - y) * (*width) * 4 + 0] = t0; (*data)[x * 4 + ((*height-1) - y) * (*width) * 4 + 1] = t1;
+        (*data)[x * 4 + ((*height-1) - y) * (*width) * 4 + 2] = t2; (*data)[x * 4 + ((*height-1) - y) * (*width) * 4 + 3] = t3;
+    }
+  
 }
 
 
@@ -261,6 +377,9 @@ int main(int argc, char** argv) {
 
         // ssao+ geometry shader
         modelObj->addProg("ssao+_geometry_vs.txt", "ssao+_geometry_fs.txt");
+
+        // nnao geometry shader
+        modelObj->addProg("nnao_geometry_vs.txt", "nnao_geometry_fs.txt");
     }
 
     // set up framebuffer for rendering geometric information
@@ -303,7 +422,7 @@ int main(int argc, char** argv) {
     // SSAO color buffer
     glGenTextures(1, &ssaoColorBuffer);
     glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, 800, 600, 0, GL_RED, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, 800, 600, 0, GL_RED, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
@@ -317,6 +436,7 @@ int main(int argc, char** argv) {
     planeObj->debugScreen.BuildFiles("debug_screen_vs.txt", "debug_screen_fs.txt");
     planeObj->ssaoTexture.BuildFiles("ssao_texture_vs.txt", "ssao_texture_fs.txt");
     planeObj->ssaoPlusTexture.BuildFiles("ssao+_texture_vs.txt", "ssao+_texture_fs.txt");
+    planeObj->nnaoTexture.BuildFiles("nnao_texture_vs.txt", "nnao.fs");
 
     glGenVertexArrays(1, &(planeObj->VAO)); 
     glBindVertexArray(planeObj->VAO);
@@ -332,6 +452,12 @@ int main(int argc, char** argv) {
     planeObj->ssaoTexture["viewSpacePos"] = 0;
     planeObj->ssaoPlusTexture["viewSpacePos"] = 0;
     planeObj->ssaoPlusTexture["gNormal"] = 2;
+    planeObj->nnaoTexture["viewSpacePos"] = 0;
+    planeObj->nnaoTexture["gNormal"] = 2;
+    planeObj->nnaoTexture["F0"] = 3;
+    planeObj->nnaoTexture["F1"] = 4;
+    planeObj->nnaoTexture["F2"] = 5;
+    planeObj->nnaoTexture["F3"] = 6;
     planeObj->debugScreen["viewSpacePos"] = 0;
     planeObj->debugScreen["ssaoTexture"] = 1;
     planeObj->debugScreen["gNormal"] = 2;
@@ -339,6 +465,30 @@ int main(int argc, char** argv) {
     // generate samples in a unit sphere and send them to fragment shader
     Init::setSphereSamples(sample_sphere_radius);
     Init::setHemiSphereSamples(sample_sphere_radius);
+
+     /* Load Filters */
+  
+    glGenTextures(FILTER_NUM, F_tex);
+
+    for (int i = 0; i < FILTER_NUM; i++) {
+        
+        char filename[512];
+        sprintf(filename, "./nnao_f%i.tga", i);
+
+        uint16_t width, height;
+        unsigned char *filter_data;
+        sprintf(filename, "./nnao_f%i.tga", i);
+        load_tga(filename, &width, &height, &filter_data);
+        
+        glBindTexture(GL_TEXTURE_2D, F_tex[i]);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, FILTER_SIZE, FILTER_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, filter_data);
+        
+        free(filter_data);
+    }
 
     glutMainLoop();
 
@@ -355,6 +505,7 @@ modelObj progs indexes:
 2 -- ssao geometry shader (for rendering geometric info into gbuffer)
 3 -- ssao lighting shader (final render that applies the ssao texture)
 4 -- ssao+ geometry shader
+5 -- nnao geometry shader
 */
 
 

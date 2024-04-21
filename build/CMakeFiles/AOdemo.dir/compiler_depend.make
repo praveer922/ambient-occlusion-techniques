@@ -538,8 +538,113 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
   /usr/include/c++/11/bits/random.tcc \
   /usr/include/c++/11/numeric \
   /usr/include/c++/11/bits/stl_numeric.h \
-  /usr/include/c++/11/pstl/glue_numeric_defs.h
+  /usr/include/c++/11/pstl/glue_numeric_defs.h \
+  /usr/include/SDL2/SDL.h \
+  /usr/include/SDL2/SDL_main.h \
+  /usr/include/SDL2/SDL_stdinc.h \
+  /usr/include/SDL2/SDL_config.h \
+  /usr/include/x86_64-linux-gnu/SDL2/_real_SDL_config.h \
+  /usr/include/SDL2/SDL_platform.h \
+  /usr/include/SDL2/begin_code.h \
+  /usr/include/SDL2/close_code.h \
+  /usr/include/c++/11/math.h \
+  /usr/lib/gcc/x86_64-linux-gnu/11/include/float.h \
+  /usr/include/SDL2/SDL_assert.h \
+  /usr/include/SDL2/SDL_atomic.h \
+  /usr/include/SDL2/SDL_platform.h \
+  /usr/include/SDL2/SDL_audio.h \
+  /usr/include/SDL2/SDL_error.h \
+  /usr/include/SDL2/SDL_endian.h \
+  /usr/include/SDL2/SDL_mutex.h \
+  /usr/include/SDL2/SDL_thread.h \
+  /usr/include/SDL2/SDL_rwops.h \
+  /usr/include/SDL2/SDL_clipboard.h \
+  /usr/include/SDL2/SDL_cpuinfo.h \
+  /usr/include/SDL2/SDL_events.h \
+  /usr/include/SDL2/SDL_video.h \
+  /usr/include/SDL2/SDL_pixels.h \
+  /usr/include/SDL2/SDL_rect.h \
+  /usr/include/SDL2/SDL_surface.h \
+  /usr/include/SDL2/SDL_blendmode.h \
+  /usr/include/SDL2/SDL_keyboard.h \
+  /usr/include/SDL2/SDL_keycode.h \
+  /usr/include/SDL2/SDL_scancode.h \
+  /usr/include/SDL2/SDL_mouse.h \
+  /usr/include/SDL2/SDL_joystick.h \
+  /usr/include/SDL2/SDL_gamecontroller.h \
+  /usr/include/SDL2/SDL_sensor.h \
+  /usr/include/SDL2/SDL_quit.h \
+  /usr/include/SDL2/SDL_gesture.h \
+  /usr/include/SDL2/SDL_touch.h \
+  /usr/include/SDL2/SDL_filesystem.h \
+  /usr/include/SDL2/SDL_haptic.h \
+  /usr/include/SDL2/SDL_hidapi.h \
+  /usr/include/SDL2/SDL_hints.h \
+  /usr/include/SDL2/SDL_loadso.h \
+  /usr/include/SDL2/SDL_log.h \
+  /usr/include/SDL2/SDL_messagebox.h \
+  /usr/include/SDL2/SDL_metal.h \
+  /usr/include/SDL2/SDL_power.h \
+  /usr/include/SDL2/SDL_render.h \
+  /usr/include/SDL2/SDL_shape.h \
+  /usr/include/SDL2/SDL_system.h \
+  /usr/include/SDL2/SDL_timer.h \
+  /usr/include/SDL2/SDL_version.h \
+  /usr/include/SDL2/SDL_locale.h \
+  /usr/include/SDL2/SDL_misc.h
 
+
+/usr/include/SDL2/SDL_locale.h:
+
+/usr/include/SDL2/SDL_metal.h:
+
+/usr/include/SDL2/SDL_messagebox.h:
+
+/usr/include/SDL2/SDL_haptic.h:
+
+/usr/include/SDL2/SDL_filesystem.h:
+
+/usr/include/SDL2/SDL_touch.h:
+
+/usr/include/SDL2/SDL_shape.h:
+
+/usr/include/SDL2/SDL_quit.h:
+
+/usr/include/SDL2/SDL_scancode.h:
+
+/usr/include/SDL2/SDL_keyboard.h:
+
+/usr/include/SDL2/SDL_blendmode.h:
+
+/usr/include/SDL2/SDL_rect.h:
+
+/usr/include/SDL2/SDL_video.h:
+
+/usr/include/SDL2/SDL_cpuinfo.h:
+
+/usr/include/SDL2/SDL_thread.h:
+
+/usr/include/SDL2/SDL_endian.h:
+
+/usr/include/SDL2/SDL_error.h:
+
+/usr/include/SDL2/SDL_audio.h:
+
+/usr/include/SDL2/SDL_assert.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/float.h:
+
+/usr/include/c++/11/math.h:
+
+/usr/include/SDL2/close_code.h:
+
+/usr/include/SDL2/SDL_version.h:
+
+/usr/include/SDL2/begin_code.h:
+
+/usr/include/SDL2/SDL_stdinc.h:
+
+/usr/include/SDL2/SDL.h:
 
 /usr/include/c++/11/numeric:
 
@@ -551,6 +656,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/c++/11/bits/atomic_base.h:
 
+/usr/include/SDL2/SDL_clipboard.h:
+
 /usr/include/c++/11/bits/shared_ptr_atomic.h:
 
 /usr/include/c++/11/ext/concurrence.h:
@@ -558,6 +665,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/include/c++/11/bits/refwrap.h:
 
 /usr/include/c++/11/bits/allocated_ptr.h:
+
+/usr/include/SDL2/SDL_keycode.h:
 
 /usr/include/c++/11/bits/invoke.h:
 
@@ -576,6 +685,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/include/c++/11/memory:
 
 /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Init.h:
+
+/usr/include/SDL2/SDL_sensor.h:
 
 /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Object.h:
 
@@ -623,6 +734,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/avx512bf16vlintrin.h:
 
+/usr/include/SDL2/SDL_loadso.h:
+
 /usr/lib/gcc/x86_64-linux-gnu/11/include/vaesintrin.h:
 
 /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/lodepng.h:
@@ -633,9 +746,13 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/fmaintrin.h:
 
+/usr/include/SDL2/SDL_system.h:
+
 /usr/lib/gcc/x86_64-linux-gnu/11/include/shaintrin.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/avx512vp2intersectintrin.h:
+
+/usr/include/SDL2/SDL_power.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/avx512bitalgintrin.h:
 
@@ -658,6 +775,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/lib/gcc/x86_64-linux-gnu/11/include/avx512dqintrin.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/avx512vlintrin.h:
+
+/usr/include/SDL2/SDL_mutex.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/avx512cdintrin.h:
 
@@ -688,6 +807,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/lib/gcc/x86_64-linux-gnu/11/include/xsavecintrin.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/xsaveintrin.h:
+
+/usr/include/SDL2/SDL_log.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/avx512pfintrin.h:
 
@@ -723,6 +844,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h:
 
+/usr/include/SDL2/SDL_gamecontroller.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/timer_t.h:
 
 /usr/include/c++/11/ext/atomicity.h:
@@ -737,7 +860,11 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/x86_64-linux-gnu/bits/cpu-set.h:
 
+/usr/include/SDL2/SDL_render.h:
+
 /mnt/c/Users/tewar/Documents/Utah/FinalProject/source/includes/lodepng.h:
+
+/usr/include/SDL2/SDL_hints.h:
 
 /usr/include/pthread.h:
 
@@ -784,6 +911,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/include/c++/11/ext/alloc_traits.h:
 
 /usr/include/x86_64-linux-gnu/bits/sched.h:
+
+/usr/include/SDL2/SDL_rwops.h:
 
 /usr/include/c++/11/bits/stringfwd.h:
 
@@ -843,6 +972,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/c++/11/ext/type_traits.h:
 
+/usr/include/SDL2/SDL_surface.h:
+
 /usr/include/x86_64-linux-gnu/c++/11/bits/gthr.h:
 
 /usr/include/c++/11/bits/functexcept.h:
@@ -867,7 +998,11 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/c++/11/clocale:
 
+/usr/include/SDL2/SDL_mouse.h:
+
 /usr/include/c++/11/bits/ostream.tcc:
+
+/usr/include/SDL2/SDL_misc.h:
 
 /usr/include/x86_64-linux-gnu/c++/11/bits/atomic_word.h:
 
@@ -885,7 +1020,11 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/c++/11/bits/stl_iterator_base_types.h:
 
+/usr/include/SDL2/SDL_atomic.h:
+
 /usr/include/c++/11/cstdlib:
+
+/usr/include/SDL2/SDL_joystick.h:
 
 /usr/include/assert.h:
 
@@ -977,6 +1116,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/c++/11/cmath:
 
+/usr/include/SDL2/SDL_gesture.h:
+
 /usr/include/ctype.h:
 
 /usr/include/c++/11/bits/align.h:
@@ -1031,6 +1172,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/c++/11/bits/range_access.h:
 
+/usr/include/SDL2/SDL_hidapi.h:
+
 /usr/include/c++/11/bits/stl_vector.h:
 
 /usr/include/c++/11/cstddef:
@@ -1073,6 +1216,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/x86_64-linux-gnu/bits/byteswap.h:
 
+/usr/include/SDL2/SDL_timer.h:
+
 /usr/include/X11/Xutil.h:
 
 /usr/include/x86_64-linux-gnu/bits/uintn-identity.h:
@@ -1105,6 +1250,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/wctype.h:
 
+/usr/include/SDL2/SDL_main.h:
+
 /usr/include/x86_64-linux-gnu/c++/11/bits/ctype_base.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h:
@@ -1120,6 +1267,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/include/c++/11/bits/charconv.h:
 
 /usr/include/c++/11/bits/basic_string.tcc:
+
+/usr/include/SDL2/SDL_pixels.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h:
 
@@ -1209,6 +1358,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/c++/11/cwctype:
 
+/usr/include/SDL2/SDL_config.h:
+
 /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/main.cpp:
 
 /usr/include/c++/11/bits/streambuf_iterator.h:
@@ -1218,6 +1369,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
 
 /usr/include/c++/11/bits/locale_facets.tcc:
+
+/usr/include/SDL2/SDL_events.h:
 
 /usr/include/x86_64-linux-gnu/c++/11/bits/opt_random.h:
 
@@ -1267,6 +1420,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/c++/11/tr1/beta_function.tcc:
 
+/usr/include/x86_64-linux-gnu/SDL2/_real_SDL_config.h:
+
 /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h:
 
 /usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
@@ -1276,6 +1431,8 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/include/c++/11/tr1/riemann_zeta.tcc:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/x86gprintrin.h:
+
+/usr/include/SDL2/SDL_platform.h:
 
 /usr/include/c++/11/random:
 

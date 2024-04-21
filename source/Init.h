@@ -157,6 +157,9 @@ namespace Init {
         } else if (key == 'h' || key == 'H') { 
             AOMode = 3;
             cout << "Switched to SSAO+." << endl;
+        } else if (key == 'n' || key == 'N') { 
+            AOMode = 4;
+            cout << "Switched to NNAO." << endl;
         } else if (key == 't' || key == 'T') { 
             AO_ONLY_MODE = !AO_ONLY_MODE;
             cout << "Toggled AO ONLY mode." << endl;
