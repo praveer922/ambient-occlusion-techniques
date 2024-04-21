@@ -75,17 +75,8 @@ uniform float cam_clip_far = 1000.0;
 
 uniform mat4 cam_proj;
 
-uniform mat4 cam_inv_proj;
-
 float perspective_depth(float d, float n, float f) {
   return -((2 * n) / d - f - n) / (f - n);
-}
- 
-vec3 camera_space(vec2 texcoord, float depth) {
-  vec4 position_clip = vec4(vec3(texcoord, 
-    perspective_depth(1-depth, cam_clip_near, cam_clip_far)) * 2.0 - 1.0, 1.0);
-  vec4 position = cam_inv_proj * position_clip;
-  return position.xyz / position.w;
 }
 
 vec3 rand(vec3 seed){

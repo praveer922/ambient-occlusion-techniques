@@ -212,7 +212,6 @@ void display() {
         glClear(GL_COLOR_BUFFER_BIT);
         planeObj->nnaoTexture.Bind();
         planeObj->nnaoTexture["cam_proj"] = proj;
-        planeObj->nnaoTexture["cam_inv_proj"] = proj.GetInverse();
         planeObj->nnaoTexture["radius"] = sample_sphere_radius;
         glBindVertexArray(planeObj->VAO);
         // set gbuffer
@@ -234,17 +233,46 @@ void display() {
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        // render debug screen
+
+        // 3. final render with AO applied
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        planeObj->debugScreen.Bind();
-        glBindVertexArray(planeObj->VAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, gNormal);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        if (!AO_ONLY_MODE) {
+            // 3. final render with AO applied
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            // draw light
+            scene[0]->progs[0]->Bind();
+            (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
+            (*scene[0]->progs[0])["view"] = view;
+            (*scene[0]->progs[0])["projection"] = proj;
+            glBindVertexArray(scene[0]->VAO);
+            glDrawElements(GL_TRIANGLES, scene[0]->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+
+
+            // draw all other models
+            for (int i=1;i<scene.size();i++) {
+                shared_ptr<Object> modelObj = scene[i];
+                modelObj->progs[3]->Bind();
+                (*modelObj->progs[3])["model"] = modelObj->modelMatrix;
+                (*modelObj->progs[3])["view"] = view;
+                (*modelObj->progs[3])["projection"] = proj;
+                glBindVertexArray(modelObj->VAO);
+                glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+            }
+        } else {
+            // render AO only screen
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            planeObj->debugScreen.Bind();
+            glBindVertexArray(planeObj->VAO);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, gNormal);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        }
+
     }
 
     glutSwapBuffers();
