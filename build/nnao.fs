@@ -6,18 +6,7 @@
 #define FW 31
 #define HW ((FW-1)/2)
 
-/* Comment out to disable new sampling method */
-#define SPIRAL_SAMPLER
-
-#ifdef SPIRAL_SAMPLER
-//#define NSAMPLES 8
-#define NSAMPLES 16
-//#define NSAMPLES 32
-#else
-//#define NSAMPLES 32
 #define NSAMPLES 64
-//#define NSAMPLES 128
-#endif
 
 varying vec2 fTexcoord;
 

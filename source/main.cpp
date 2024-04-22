@@ -234,12 +234,23 @@ void display() {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
-        // 3. final render with AO applied
+        // 3. blur ssao texture
+        glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
+        glClear(GL_COLOR_BUFFER_BIT);
+        planeObj->ssaoBlurTexture.Bind();
+        glBindVertexArray(planeObj->VAO);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+        // 4. final render with AO applied
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         if (!AO_ONLY_MODE) {
             // 3. final render with AO applied
             glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
             // draw light
             scene[0]->progs[0]->Bind();
             (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
@@ -267,7 +278,7 @@ void display() {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
             glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, gNormal);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -445,7 +456,7 @@ int main(int argc, char** argv) {
 
     // also create framebuffer to hold SSAO processing stage 
     // -----------------------------------------------------
-    glGenFramebuffers(1, &ssaoFBO);  glGenFramebuffers(1, &ssaoBlurFBO);
+    glGenFramebuffers(1, &ssaoFBO); 
     glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
     // SSAO color buffer
     glGenTextures(1, &ssaoColorBuffer);
@@ -458,6 +469,16 @@ int main(int argc, char** argv) {
         std::cout << "SSAO Framebuffer not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    //ssao blur framebuffer
+    glGenFramebuffers(1, &ssaoBlurFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
+    glGenTextures(1, &ssaoColorBufferBlur);
+    glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, 800, 600, 0, GL_RED, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBufferBlur, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // set up plane
     planeObj = make_shared<PlaneObject>(&PredefinedModels::quadVertices);
@@ -465,6 +486,7 @@ int main(int argc, char** argv) {
     planeObj->ssaoTexture.BuildFiles("ssao_texture_vs.txt", "ssao_texture_fs.txt");
     planeObj->ssaoPlusTexture.BuildFiles("ssao+_texture_vs.txt", "ssao+_texture_fs.txt");
     planeObj->nnaoTexture.BuildFiles("nnao_texture_vs.txt", "nnao.fs");
+    planeObj->ssaoBlurTexture.BuildFiles("ssao+_texture_vs.txt", "ssao_blur_texture_fs.txt");
 
     glGenVertexArrays(1, &(planeObj->VAO)); 
     glBindVertexArray(planeObj->VAO);
@@ -489,6 +511,7 @@ int main(int argc, char** argv) {
     planeObj->debugScreen["viewSpacePos"] = 0;
     planeObj->debugScreen["ssaoTexture"] = 1;
     planeObj->debugScreen["gNormal"] = 2;
+    planeObj->ssaoBlurTexture["ssaoTexture"] = 1;
 
     // generate samples in a unit sphere and send them to fragment shader
     Init::setSphereSamples(sample_sphere_radius);
