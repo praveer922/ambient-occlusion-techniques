@@ -18,7 +18,9 @@ t -- toggle AO only mode
 b -- toggle blur post processing   
 
 Left click mouse (hold) to control camera  
-Right click mouse (hold) to move forward/backward
+Right click mouse (hold) to move forward/backward  
+
+up/down keys control radius for sampling
 
 
 
