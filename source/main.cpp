@@ -26,6 +26,8 @@ int AOMode = 0;
 bool AO_ONLY_MODE = false;
 float sample_sphere_radius = 0.5;
 
+bool BLUR_ON = false;
+
 enum {
   FILTER_NUM  = 4,
   FILTER_SIZE = 32,
@@ -89,11 +91,26 @@ void display() {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
+         // 3. blur ssao texture
+        glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
+        glClear(GL_COLOR_BUFFER_BIT);
+        planeObj->ssaoBlurTexture.Bind();
+        glBindVertexArray(planeObj->VAO);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         if (!AO_ONLY_MODE) {
-            // 3. final render with AO applied
+            // 4. final render with AO applied
             glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            if (BLUR_ON) {
+                glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
+            } else {
+                glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            }
             // draw light
             scene[0]->progs[0]->Bind();
             (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
@@ -119,7 +136,11 @@ void display() {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
             glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            if (BLUR_ON) {
+                glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
+            } else {
+                glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            }
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
     } else if (AOMode == 3) { // SSAO+ 
@@ -153,12 +174,26 @@ void display() {
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-          // 3. final render with AO applied
+          // 3. blur ssao texture
+        glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
+        glClear(GL_COLOR_BUFFER_BIT);
+        planeObj->ssaoBlurTexture.Bind();
+        glBindVertexArray(planeObj->VAO);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+          // 4. final render with AO applied
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         if (!AO_ONLY_MODE) {
             // 3. final render with AO applied
             glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            if (BLUR_ON) {
+                glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
+            } else {
+                glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            }
             // draw light
             scene[0]->progs[0]->Bind();
             (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
@@ -184,7 +219,11 @@ void display() {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
             glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            if (BLUR_ON) {
+                glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
+            } else {
+                glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            }
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, gNormal);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -250,7 +289,11 @@ void display() {
         if (!AO_ONLY_MODE) {
             // 3. final render with AO applied
             glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
+            if (BLUR_ON) {
+                glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
+            } else {
+                glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            }
             // draw light
             scene[0]->progs[0]->Bind();
             (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
@@ -278,7 +321,11 @@ void display() {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
             glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
+            if (BLUR_ON) {
+                glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
+            } else {
+                glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+            }
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, gNormal);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -568,7 +615,8 @@ o -- No Ambient Occlusion [done]
 c -- constant ambient lighting [done]
 s -- screen space ao (ssao) [done]
 h -- normal-based hemisphere AO (ssao+) [done]
-n -- neural network ambient occlusion
+n -- neural network ambient occlusion [done]
 t -- toggle AO only mode [done]
+b -- toggle blur post processing [done]
 
 */

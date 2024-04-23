@@ -10,6 +10,7 @@ using namespace std;
 
 extern int AOMode;
 extern bool AO_ONLY_MODE;
+extern bool BLUR_ON;
 extern float sample_sphere_radius;
 extern shared_ptr<PlaneObject> planeObj;
 
@@ -163,6 +164,9 @@ namespace Init {
         } else if (key == 't' || key == 'T') { 
             AO_ONLY_MODE = !AO_ONLY_MODE;
             cout << "Toggled AO ONLY mode." << endl;
+        } else if (key == 'b' || key == 'B') { 
+            BLUR_ON = !BLUR_ON;
+            cout << "Toggled blur post processing." << endl;
         } 
         glutPostRedisplay();
     }
