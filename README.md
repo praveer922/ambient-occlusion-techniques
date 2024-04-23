@@ -3,7 +3,7 @@ This is a demo of three different ambient occlusion implementations in a real ti
 
 Build and Run (linux):
 
-From the base directory, 
+From the base directory,  
 ./build.sh  
 ./run.sh  
 
