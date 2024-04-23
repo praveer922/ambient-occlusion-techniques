@@ -36,6 +36,7 @@ enum {
 static GLuint F_tex[FILTER_NUM];
 
 
+
 void display() { 
     cy::Matrix4f view = camera.getLookAtMatrix();
     cy::Matrix4f proj = camera.getProjectionMatrix();
@@ -332,7 +333,6 @@ void display() {
         }
 
     }
-
     glutSwapBuffers();
 }
 
@@ -592,19 +592,6 @@ int main(int argc, char** argv) {
 
     return 0;
 }
-
-
-/* 
-
-modelObj progs indexes:
-
-0 -- no ambient light
-1 -- constant ambient light
-2 -- ssao geometry shader (for rendering geometric info into gbuffer)
-3 -- ssao lighting shader (final render that applies the ssao texture)
-4 -- ssao+ geometry shader
-5 -- nnao geometry shader
-*/
 
 
 /* 
