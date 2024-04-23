@@ -17,8 +17,8 @@ n -- neural network ambient occlusion (nnao)
 t -- toggle AO only mode   
 b -- toggle blur post processing   
 
-Left click mouse (hold) to control camera
-Right click moouse (hold) to move forward/backward
+Left click mouse (hold) to control camera  
+Right click mouse (hold) to move forward/backward
 
 
 
