@@ -23,5 +23,7 @@ Right click mouse (hold) to move forward/backward
 up/down keys control radius for sampling
 
 
+Demo video:
 
+https://github.com/praveer922/ambient-occlusion-techniques/assets/13656683/9100e4dd-7790-41d2-b0a5-e40ae6218128
 
