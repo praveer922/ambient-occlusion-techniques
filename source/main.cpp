@@ -10,7 +10,6 @@
 #include "Init.h"
 #include <memory>
 #include <iostream>
-#include "SDL2/SDL.h"
 
 using namespace std;
 
@@ -23,17 +22,88 @@ unsigned int ssaoFBO, ssaoBlurFBO;
 unsigned int ssaoColorBuffer, ssaoColorBufferBlur;
 
 int AOMode = 0;
-bool AO_ONLY_MODE = false;
 float sample_sphere_radius = 0.5;
-
+bool AO_ONLY_MODE = false;
 bool BLUR_ON = false;
 
+
+// NNAO settings
 enum {
   FILTER_NUM  = 4,
   FILTER_SIZE = 32,
 };
-
 static GLuint F_tex[FILTER_NUM];
+
+
+void render_AO_only_screen() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    planeObj->debugScreen.Bind();
+    glBindVertexArray(planeObj->VAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
+    glActiveTexture(GL_TEXTURE1);
+    if (BLUR_ON) {
+        glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
+    } else {
+        glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+    }
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, gNormal);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+void render_blur_texture() {
+    glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
+    glClear(GL_COLOR_BUFFER_BIT);
+    planeObj->ssaoBlurTexture.Bind();
+    glBindVertexArray(planeObj->VAO);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void drawLight(cy::Matrix4f &view, cy::Matrix4f &proj) {
+    scene[0]->progs[0]->Bind();
+    (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
+    (*scene[0]->progs[0])["view"] = view;
+    (*scene[0]->progs[0])["projection"] = proj;
+    glBindVertexArray(scene[0]->VAO);
+    glDrawElements(GL_TRIANGLES, scene[0]->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+}
+
+
+void drawScene(cy::Matrix4f &view, cy::Matrix4f &proj, int progIndex) {
+    // draw all other models (besides light)
+    for (int i=1;i<scene.size();i++) {
+            shared_ptr<Object> modelObj = scene[i];
+            modelObj->progs[progIndex]->Bind();
+            (*modelObj->progs[progIndex])["model"] = modelObj->modelMatrix;
+            (*modelObj->progs[progIndex])["view"] = view;
+            (*modelObj->progs[progIndex])["projection"] = proj;
+            glBindVertexArray(modelObj->VAO);
+            glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
+        }
+}
+
+void render_with_occ(cy::Matrix4f &view, cy::Matrix4f &proj) {
+    if (!AO_ONLY_MODE) {
+        // final lighting pass with AO applied
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glActiveTexture(GL_TEXTURE1);
+        if (BLUR_ON) {
+            glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
+        } else {
+            glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+        }
+        drawLight(view,proj);
+        drawScene(view,proj,3); // draw scene with ssao_lighting_fs
+    } else {
+        render_AO_only_screen();
+    }
+}
+
+
 
 
 
@@ -43,39 +113,14 @@ void display() {
 
     if (AOMode <= 1) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        // draw light
-        scene[0]->progs[0]->Bind();
-        (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
-        (*scene[0]->progs[0])["view"] = view;
-        (*scene[0]->progs[0])["projection"] = proj;
-        glBindVertexArray(scene[0]->VAO);
-        glDrawElements(GL_TRIANGLES, scene[0]->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
-
-
-        // draw all other models
-        for (int i=1;i<scene.size();i++) {
-            shared_ptr<Object> modelObj = scene[i];
-            modelObj->progs[AOMode]->Bind();
-            (*modelObj->progs[AOMode])["model"] = modelObj->modelMatrix;
-            (*modelObj->progs[AOMode])["view"] = view;
-            (*modelObj->progs[AOMode])["projection"] = proj;
-            glBindVertexArray(modelObj->VAO);
-            glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
-        }
+        drawLight(view, proj);
+        drawScene(view, proj, AOMode);
     } else if (AOMode == 2) { //SSAO
         // 1. geometry pass: render scene's geometry/color data into gbuffer
         // -----------------------------------------------------------------
         glBindFramebuffer(GL_FRAMEBUFFER, gbuffer);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        for (int i=1;i<scene.size();i++) {
-            shared_ptr<Object> modelObj = scene[i];
-            modelObj->progs[2]->Bind();
-            (*modelObj->progs[2])["model"] = modelObj->modelMatrix;
-            (*modelObj->progs[2])["view"] = view;
-            (*modelObj->progs[2])["projection"] = proj;
-            glBindVertexArray(modelObj->VAO);
-            glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
-        }
+        drawScene(view,proj,2); // draw scene with ssao_geometry_fs
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // 2. generate SSAO texture
@@ -91,59 +136,11 @@ void display() {
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+        // 3. render blur texture
+        render_blur_texture();
 
-         // 3. blur ssao texture
-        glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
-        glClear(GL_COLOR_BUFFER_BIT);
-        planeObj->ssaoBlurTexture.Bind();
-        glBindVertexArray(planeObj->VAO);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        if (!AO_ONLY_MODE) {
-            // 4. final render with AO applied
-            glActiveTexture(GL_TEXTURE1);
-            if (BLUR_ON) {
-                glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
-            } else {
-                glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-            }
-            // draw light
-            scene[0]->progs[0]->Bind();
-            (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
-            (*scene[0]->progs[0])["view"] = view;
-            (*scene[0]->progs[0])["projection"] = proj;
-            glBindVertexArray(scene[0]->VAO);
-            glDrawElements(GL_TRIANGLES, scene[0]->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
-
-
-            // draw all other models
-            for (int i=1;i<scene.size();i++) {
-                shared_ptr<Object> modelObj = scene[i];
-                modelObj->progs[3]->Bind();
-                (*modelObj->progs[3])["model"] = modelObj->modelMatrix;
-                (*modelObj->progs[3])["view"] = view;
-                (*modelObj->progs[3])["projection"] = proj;
-                glBindVertexArray(modelObj->VAO);
-                glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
-            }
-        } else {
-            planeObj->debugScreen.Bind();
-            glBindVertexArray(planeObj->VAO);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
-            glActiveTexture(GL_TEXTURE1);
-            if (BLUR_ON) {
-                glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
-            } else {
-                glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-            }
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        }
+        // 4. final render with AO applied
+        render_with_occ(view, proj);
     } else if (AOMode == 3) { // SSAO+ 
         // 1. geometry pass: render scene's geometry/normal data into gbuffer
         // -----------------------------------------------------------------
@@ -175,60 +172,11 @@ void display() {
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-          // 3. blur ssao texture
-        glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
-        glClear(GL_COLOR_BUFFER_BIT);
-        planeObj->ssaoBlurTexture.Bind();
-        glBindVertexArray(planeObj->VAO);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+          // 3. render blur texture
+        render_blur_texture();
 
-          // 4. final render with AO applied
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        if (!AO_ONLY_MODE) {
-            // 3. final render with AO applied
-            glActiveTexture(GL_TEXTURE1);
-            if (BLUR_ON) {
-                glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
-            } else {
-                glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-            }
-            // draw light
-            scene[0]->progs[0]->Bind();
-            (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
-            (*scene[0]->progs[0])["view"] = view;
-            (*scene[0]->progs[0])["projection"] = proj;
-            glBindVertexArray(scene[0]->VAO);
-            glDrawElements(GL_TRIANGLES, scene[0]->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
-
-
-            // draw all other models
-            for (int i=1;i<scene.size();i++) {
-                shared_ptr<Object> modelObj = scene[i];
-                modelObj->progs[3]->Bind();
-                (*modelObj->progs[3])["model"] = modelObj->modelMatrix;
-                (*modelObj->progs[3])["view"] = view;
-                (*modelObj->progs[3])["projection"] = proj;
-                glBindVertexArray(modelObj->VAO);
-                glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
-            }
-        } else {
-            planeObj->debugScreen.Bind();
-            glBindVertexArray(planeObj->VAO);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
-            glActiveTexture(GL_TEXTURE1);
-            if (BLUR_ON) {
-                glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
-            } else {
-                glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-            }
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, gNormal);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        }
+        // 4. final render with AO applied
+        render_with_occ(view, proj);
 
     } else if (AOMode == 4) { // NNAO
         // 1. geometry pass: render scene's geometry/normal data into gbuffer
@@ -275,117 +223,13 @@ void display() {
 
 
         // 3. blur ssao texture
-        glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
-        glClear(GL_COLOR_BUFFER_BIT);
-        planeObj->ssaoBlurTexture.Bind();
-        glBindVertexArray(planeObj->VAO);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        render_blur_texture();
 
-
-        // 4. final render with AO applied
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        if (!AO_ONLY_MODE) {
-            // 3. final render with AO applied
-            glActiveTexture(GL_TEXTURE1);
-            if (BLUR_ON) {
-                glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
-            } else {
-                glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-            }
-            // draw light
-            scene[0]->progs[0]->Bind();
-            (*scene[0]->progs[0])["model"] = scene[0]->modelMatrix;
-            (*scene[0]->progs[0])["view"] = view;
-            (*scene[0]->progs[0])["projection"] = proj;
-            glBindVertexArray(scene[0]->VAO);
-            glDrawElements(GL_TRIANGLES, scene[0]->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
-
-
-            // draw all other models
-            for (int i=1;i<scene.size();i++) {
-                shared_ptr<Object> modelObj = scene[i];
-                modelObj->progs[3]->Bind();
-                (*modelObj->progs[3])["model"] = modelObj->modelMatrix;
-                (*modelObj->progs[3])["view"] = view;
-                (*modelObj->progs[3])["projection"] = proj;
-                glBindVertexArray(modelObj->VAO);
-                glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
-            }
-        } else {
-            // render AO only screen
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            planeObj->debugScreen.Bind();
-            glBindVertexArray(planeObj->VAO);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
-            glActiveTexture(GL_TEXTURE1);
-            if (BLUR_ON) {
-                glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
-            } else {
-                glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-            }
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, gNormal);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        }
+         // 4. final render with AO applied
+        render_with_occ(view, proj);
 
     }
     glutSwapBuffers();
-}
-
-static void load_tga(const char *filename, uint16_t *width, uint16_t *height, unsigned char **data) {
-  
-    SDL_RWops* file = SDL_RWFromFile(filename, "rb");
-  
-	if (file == NULL) {
-		printf("Cannot open file %s", filename);
-        exit(1);
-	}
-	
-    char depth;
-	SDL_RWseek(file, 12, SEEK_SET);
-	SDL_RWread(file, width, sizeof(uint16_t), 1);
-	SDL_RWseek(file, 14, SEEK_SET);
-	SDL_RWread(file, height, sizeof(uint16_t), 1);
-	SDL_RWseek(file, 16, SEEK_SET);
-	SDL_RWread(file, &depth, sizeof(char), 1);
-  
-	if (depth != 32) {
-		printf("tga file doesn't have four channels");
-        exit(1);
-    }
-  
-    *data = (unsigned char*)malloc(sizeof(unsigned char) * 4 * (*width) * (*height));
-  
-	SDL_RWseek(file, 18, SEEK_SET);
-	SDL_RWread(file, *data, sizeof(unsigned char) * 4 * (*width) * (*height), 1);
-    SDL_RWclose(file);
-    
-    for(int x = 0; x < *width; x++)
-    for(int y = 0; y < *height; y++) {
-        unsigned char t0, t1, t2, t3;
-        t0 = (*data)[x * 4 + y * (*width) * 4 + 2]; t1 = (*data)[x * 4 + y * (*width) * 4 + 1];
-        t2 = (*data)[x * 4 + y * (*width) * 4 + 0]; t3 = (*data)[x * 4 + y * (*width) * 4 + 3];
-        (*data)[x * 4 + y * (*width) * 4 + 0] = t0; (*data)[x * 4 + y * (*width) * 4 + 1] = t1; 
-        (*data)[x * 4 + y * (*width) * 4 + 2] = t2; (*data)[x * 4 + y * (*width) * 4 + 3] = t3;
-    }
-    
-    for (int x = 0; x < *width;      x++)
-    for (int y = 0; y < *height / 2; y++) {
-        unsigned char t0, t1, t2, t3, b0, b1, b2, b3;
-        t0 = (*data)[x * 4 + y * (*width) * 4 + 0]; t1 = (*data)[x * 4 + y * (*width) * 4 + 1];
-        t2 = (*data)[x * 4 + y * (*width) * 4 + 2]; t3 = (*data)[x * 4 + y * (*width) * 4 + 3];
-        b0 = (*data)[x * 4 + ((*height-1) - y) * (*width) * 4 + 0]; b1 = (*data)[x * 4 + ((*height-1) - y) * (*width) * 4 + 1];
-        b2 = (*data)[x * 4 + ((*height-1) - y) * (*width) * 4 + 2]; b3 = (*data)[x * 4 + ((*height-1) - y) * (*width) * 4 + 3];
-        (*data)[x * 4 + y * (*width) * 4 + 0] = b0; (*data)[x * 4 + y * (*width) * 4 + 1] = b1;
-        (*data)[x * 4 + y * (*width) * 4 + 2] = b2; (*data)[x * 4 + y * (*width) * 4 + 3] = b3;
-        (*data)[x * 4 + ((*height-1) - y) * (*width) * 4 + 0] = t0; (*data)[x * 4 + ((*height-1) - y) * (*width) * 4 + 1] = t1;
-        (*data)[x * 4 + ((*height-1) - y) * (*width) * 4 + 2] = t2; (*data)[x * 4 + ((*height-1) - y) * (*width) * 4 + 3] = t3;
-    }
-  
 }
 
 
@@ -394,37 +238,20 @@ int main(int argc, char** argv) {
     Init::initGL("Ambient Occlusion Techniques", argc, argv);
     Init::setCallbacks(display);
 
+    // initialize light
     shared_ptr<Object> areaLight = Init::initUntexturedModel("area_light.obj");
     scene.push_back(areaLight);
+    cy::Vec3f lightPos = (areaLight->mesh.GetBoundMin() + areaLight->mesh.GetBoundMax()) * 0.5f;
+    scene[0]->addProg("vs.txt", "light_fs.txt"); // shader program for the light itself
 
-    shared_ptr<Object> backWall = Init::initUntexturedModel("back_wall.obj");
-    scene.push_back(backWall);
-
-    shared_ptr<Object> ceiling = Init::initUntexturedModel("ceiling.obj");
-    scene.push_back(ceiling);
-
-    shared_ptr<Object> floor = Init::initUntexturedModel("floor.obj");
-    scene.push_back(floor);
-
-    shared_ptr<Object> leftWall = Init::initUntexturedModel("left_wall.obj");
-    scene.push_back(leftWall);
-
-    shared_ptr<Object> rightWall = Init::initUntexturedModel("right_wall.obj");
-    scene.push_back(rightWall);
-
-    shared_ptr<Object> shortBox = Init::initUntexturedModel("short_box.obj");
-    scene.push_back(shortBox);
-
-    shared_ptr<Object> tallBox = Init::initUntexturedModel("tall_box.obj");
-    scene.push_back(tallBox);
+    // load models
+    Init::createScene(scene, {"back_wall.obj", "ceiling.obj", "floor.obj", "left_wall.obj", "right_wall.obj", "short_box.obj", "tall_box.obj"});
     
     // init cameras
     Init::initCamera(&camera);
 
-    // initialize some uniforms
-    cy::Vec3f lightPos = (areaLight->mesh.GetBoundMin() + areaLight->mesh.GetBoundMax()) * 0.5f;
-    scene[0]->addProg("vs.txt", "light_fs.txt"); // shader program for the light itself
-    
+
+    // load shaders
     for (int i=1;i<scene.size();i++) {
         shared_ptr<Object> modelObj = scene[i];
 
@@ -564,7 +391,7 @@ int main(int argc, char** argv) {
     Init::setSphereSamples(sample_sphere_radius);
     Init::setHemiSphereSamples(sample_sphere_radius);
 
-     /* Load Filters */
+     /* Load Filters for NNAO */
   
     glGenTextures(FILTER_NUM, F_tex);
 
@@ -576,7 +403,7 @@ int main(int argc, char** argv) {
         uint16_t width, height;
         unsigned char *filter_data;
         sprintf(filename, "./nnao_f%i.tga", i);
-        load_tga(filename, &width, &height, &filter_data);
+        Util::load_tga(filename, &width, &height, &filter_data);
         
         glBindTexture(GL_TEXTURE_2D, F_tex[i]);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

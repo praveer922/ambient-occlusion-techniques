@@ -227,4 +227,11 @@ namespace Init {
         cameraPtr->setPerspectiveMatrix(65,800.0f/600.0f, 2.0f, 600.0f);
     }
 
+    void createScene(vector<shared_ptr<Object>> &scene, vector<string> obj_files) {
+        for (auto obj_s:obj_files) {
+            shared_ptr<Object> obj = initUntexturedModel(obj_s.c_str());
+            scene.push_back(obj);
+        }
+    }
+
 }

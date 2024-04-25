@@ -504,41 +504,6 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
   /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/lodepng.h \
   /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Camera.h \
   /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Util.h \
-  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Object.h \
-  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Init.h \
-  /usr/include/c++/11/memory \
-  /usr/include/c++/11/bits/stl_tempbuf.h \
-  /usr/include/c++/11/bits/stl_raw_storage_iter.h \
-  /usr/include/c++/11/bits/align.h \
-  /usr/include/c++/11/bit \
-  /usr/include/c++/11/bits/uses_allocator.h \
-  /usr/include/c++/11/bits/unique_ptr.h \
-  /usr/include/c++/11/utility \
-  /usr/include/c++/11/bits/stl_relops.h \
-  /usr/include/c++/11/tuple \
-  /usr/include/c++/11/array \
-  /usr/include/c++/11/bits/invoke.h \
-  /usr/include/c++/11/bits/shared_ptr.h \
-  /usr/include/c++/11/bits/shared_ptr_base.h \
-  /usr/include/c++/11/bits/allocated_ptr.h \
-  /usr/include/c++/11/bits/refwrap.h \
-  /usr/include/c++/11/ext/aligned_buffer.h \
-  /usr/include/c++/11/ext/concurrence.h \
-  /usr/include/c++/11/bits/shared_ptr_atomic.h \
-  /usr/include/c++/11/bits/atomic_base.h \
-  /usr/include/c++/11/bits/atomic_lockfree_defines.h \
-  /usr/include/c++/11/backward/auto_ptr.h \
-  /usr/include/c++/11/pstl/glue_memory_defs.h \
-  /usr/include/c++/11/pstl/execution_defs.h \
-  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/PredefinedModels.h \
-  /usr/include/c++/11/random \
-  /usr/include/c++/11/bits/random.h \
-  /usr/include/c++/11/bits/uniform_int_dist.h \
-  /usr/include/x86_64-linux-gnu/c++/11/bits/opt_random.h \
-  /usr/include/c++/11/bits/random.tcc \
-  /usr/include/c++/11/numeric \
-  /usr/include/c++/11/bits/stl_numeric.h \
-  /usr/include/c++/11/pstl/glue_numeric_defs.h \
   /usr/include/SDL2/SDL.h \
   /usr/include/SDL2/SDL_main.h \
   /usr/include/SDL2/SDL_stdinc.h \
@@ -592,15 +557,74 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
   /usr/include/SDL2/SDL_version.h \
   /usr/include/SDL2/SDL_locale.h \
   /usr/include/SDL2/SDL_misc.h \
-  /usr/include/c++/11/chrono \
-  /usr/include/c++/11/ratio \
-  /usr/include/c++/11/ctime \
-  /usr/include/c++/11/bits/parse_numbers.h
+  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Object.h \
+  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Init.h \
+  /usr/include/c++/11/memory \
+  /usr/include/c++/11/bits/stl_tempbuf.h \
+  /usr/include/c++/11/bits/stl_raw_storage_iter.h \
+  /usr/include/c++/11/bits/align.h \
+  /usr/include/c++/11/bit \
+  /usr/include/c++/11/bits/uses_allocator.h \
+  /usr/include/c++/11/bits/unique_ptr.h \
+  /usr/include/c++/11/utility \
+  /usr/include/c++/11/bits/stl_relops.h \
+  /usr/include/c++/11/tuple \
+  /usr/include/c++/11/array \
+  /usr/include/c++/11/bits/invoke.h \
+  /usr/include/c++/11/bits/shared_ptr.h \
+  /usr/include/c++/11/bits/shared_ptr_base.h \
+  /usr/include/c++/11/bits/allocated_ptr.h \
+  /usr/include/c++/11/bits/refwrap.h \
+  /usr/include/c++/11/ext/aligned_buffer.h \
+  /usr/include/c++/11/ext/concurrence.h \
+  /usr/include/c++/11/bits/shared_ptr_atomic.h \
+  /usr/include/c++/11/bits/atomic_base.h \
+  /usr/include/c++/11/bits/atomic_lockfree_defines.h \
+  /usr/include/c++/11/backward/auto_ptr.h \
+  /usr/include/c++/11/pstl/glue_memory_defs.h \
+  /usr/include/c++/11/pstl/execution_defs.h \
+  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/PredefinedModels.h \
+  /usr/include/c++/11/random \
+  /usr/include/c++/11/bits/random.h \
+  /usr/include/c++/11/bits/uniform_int_dist.h \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/opt_random.h \
+  /usr/include/c++/11/bits/random.tcc \
+  /usr/include/c++/11/numeric \
+  /usr/include/c++/11/bits/stl_numeric.h \
+  /usr/include/c++/11/pstl/glue_numeric_defs.h
 
 
-/usr/include/c++/11/ctime:
+/usr/include/c++/11/numeric:
 
-/usr/include/c++/11/ratio:
+/usr/include/c++/11/bits/random.h:
+
+/usr/include/c++/11/pstl/glue_memory_defs.h:
+
+/usr/include/c++/11/bits/atomic_lockfree_defines.h:
+
+/usr/include/c++/11/bits/atomic_base.h:
+
+/usr/include/c++/11/ext/concurrence.h:
+
+/usr/include/c++/11/bits/refwrap.h:
+
+/usr/include/c++/11/bits/allocated_ptr.h:
+
+/usr/include/c++/11/tuple:
+
+/usr/include/c++/11/bits/unique_ptr.h:
+
+/usr/include/c++/11/bits/uses_allocator.h:
+
+/usr/include/c++/11/bit:
+
+/usr/include/c++/11/bits/stl_raw_storage_iter.h:
+
+/usr/include/c++/11/bits/stl_tempbuf.h:
+
+/usr/include/c++/11/memory:
+
+/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Init.h:
 
 /usr/include/SDL2/SDL_locale.h:
 
@@ -618,7 +642,15 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/SDL2/SDL_quit.h:
 
+/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Object.h:
+
+/usr/include/SDL2/SDL_sensor.h:
+
 /usr/include/SDL2/SDL_scancode.h:
+
+/usr/include/c++/11/bits/invoke.h:
+
+/usr/include/SDL2/SDL_keycode.h:
 
 /usr/include/SDL2/SDL_keyboard.h:
 
@@ -629,6 +661,10 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/include/SDL2/SDL_video.h:
 
 /usr/include/SDL2/SDL_cpuinfo.h:
+
+/usr/include/c++/11/bits/shared_ptr_atomic.h:
+
+/usr/include/SDL2/SDL_clipboard.h:
 
 /usr/include/SDL2/SDL_thread.h:
 
@@ -653,50 +689,6 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/include/SDL2/SDL_stdinc.h:
 
 /usr/include/SDL2/SDL.h:
-
-/usr/include/c++/11/numeric:
-
-/usr/include/c++/11/bits/random.h:
-
-/usr/include/c++/11/pstl/glue_memory_defs.h:
-
-/usr/include/c++/11/bits/atomic_lockfree_defines.h:
-
-/usr/include/c++/11/bits/atomic_base.h:
-
-/usr/include/SDL2/SDL_clipboard.h:
-
-/usr/include/c++/11/bits/shared_ptr_atomic.h:
-
-/usr/include/c++/11/ext/concurrence.h:
-
-/usr/include/c++/11/bits/refwrap.h:
-
-/usr/include/c++/11/bits/allocated_ptr.h:
-
-/usr/include/SDL2/SDL_keycode.h:
-
-/usr/include/c++/11/bits/invoke.h:
-
-/usr/include/c++/11/tuple:
-
-/usr/include/c++/11/bits/unique_ptr.h:
-
-/usr/include/c++/11/bits/uses_allocator.h:
-
-/usr/include/c++/11/bit:
-
-/usr/include/c++/11/bits/stl_raw_storage_iter.h:
-
-/usr/include/c++/11/bits/stl_tempbuf.h:
-
-/usr/include/c++/11/memory:
-
-/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Init.h:
-
-/usr/include/SDL2/SDL_sensor.h:
-
-/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Object.h:
 
 /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Util.h:
 
@@ -1074,8 +1066,6 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h:
 
-/usr/include/c++/11/chrono:
-
 /usr/include/x86_64-linux-gnu/bits/wordsize.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h:
@@ -1213,8 +1203,6 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 /usr/include/c++/11/ext/aligned_buffer.h:
 
 /usr/include/x86_64-linux-gnu/sys/types.h:
-
-/usr/include/c++/11/bits/parse_numbers.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/clflushoptintrin.h:
 
@@ -1382,9 +1370,9 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/include/c++/11/bits/locale_facets.tcc:
 
-/usr/include/SDL2/SDL_events.h:
-
 /usr/include/x86_64-linux-gnu/c++/11/bits/opt_random.h:
+
+/usr/include/SDL2/SDL_events.h:
 
 /usr/include/c++/11/bits/codecvt.h:
 
@@ -1444,9 +1432,9 @@ CMakeFiles/AOdemo.dir/main.cpp.o: /mnt/c/Users/tewar/Documents/Utah/ambient-occl
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/x86gprintrin.h:
 
-/usr/include/SDL2/SDL_platform.h:
-
 /usr/include/c++/11/random:
+
+/usr/include/SDL2/SDL_platform.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/cldemoteintrin.h:
 
