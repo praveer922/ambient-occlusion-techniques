@@ -1,8 +1,6 @@
 file(REMOVE_RECURSE
   "AOdemo"
   "AOdemo.pdb"
-  "CMakeFiles/AOdemo.dir/includes/lodepng.cpp.o"
-  "CMakeFiles/AOdemo.dir/includes/lodepng.cpp.o.d"
   "CMakeFiles/AOdemo.dir/main.cpp.o"
   "CMakeFiles/AOdemo.dir/main.cpp.o.d"
 )

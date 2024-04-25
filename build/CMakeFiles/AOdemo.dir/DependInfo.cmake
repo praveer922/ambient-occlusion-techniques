@@ -8,7 +8,6 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/lodepng.cpp" "CMakeFiles/AOdemo.dir/includes/lodepng.cpp.o" "gcc" "CMakeFiles/AOdemo.dir/includes/lodepng.cpp.o.d"
   "/mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/main.cpp" "CMakeFiles/AOdemo.dir/main.cpp.o" "gcc" "CMakeFiles/AOdemo.dir/main.cpp.o.d"
   )
 

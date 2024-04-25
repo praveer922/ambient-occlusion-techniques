@@ -2,7 +2,7 @@
 project(AOdemo)
 
 
-set(SOURCES main.cpp includes/lodepng.cpp)
+set(SOURCES main.cpp)
 add_executable(AOdemo ${SOURCES})
 
 target_link_libraries(AOdemo GL)

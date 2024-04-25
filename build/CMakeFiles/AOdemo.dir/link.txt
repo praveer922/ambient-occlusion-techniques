@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/AOdemo.dir/main.cpp.o CMakeFiles/AOdemo.dir/includes/lodepng.cpp.o -o AOdemo  -lGL -lglut -lGLEW -lSDL2 
+/usr/bin/c++ CMakeFiles/AOdemo.dir/main.cpp.o -o AOdemo  -lGL -lglut -lGLEW -lSDL2 

@@ -4,7 +4,6 @@
 #include "includes/cyTriMesh.h"
 #include "includes/cyMatrix.h"
 #include "includes/cyGL.h"
-#include "includes/lodepng.h"
 #include "Camera.h"
 #include "Object.h"
 #include "Init.h"
@@ -104,131 +103,106 @@ void render_with_occ(cy::Matrix4f &view, cy::Matrix4f &proj) {
 }
 
 
-
-
-
 void display() { 
     cy::Matrix4f view = camera.getLookAtMatrix();
     cy::Matrix4f proj = camera.getProjectionMatrix();
 
-    if (AOMode <= 1) {
+    if (AOMode <= 1) { // No ambient light or constant ambient term
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         drawLight(view, proj);
         drawScene(view, proj, AOMode);
-    } else if (AOMode == 2) { //SSAO
-        // 1. geometry pass: render scene's geometry/color data into gbuffer
-        // -----------------------------------------------------------------
-        glBindFramebuffer(GL_FRAMEBUFFER, gbuffer);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        drawScene(view,proj,2); // draw scene with ssao_geometry_fs
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    } else {
+        switch (AOMode) {
+            case 2: 
+                // SSAO
+                // 1. geometry pass: render scene's geometry/color data into gbuffer
+                // -----------------------------------------------------------------
+                glBindFramebuffer(GL_FRAMEBUFFER, gbuffer);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                drawScene(view,proj,2); // draw scene with ssao_geometry_fs
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        // 2. generate SSAO texture
-        // ------------------------
-        glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
-        glClear(GL_COLOR_BUFFER_BIT);
-        planeObj->ssaoTexture.Bind();
-        planeObj->ssaoTexture["projection"] = proj;
-        planeObj->ssaoTexture["radius"] = sample_sphere_radius;
-        glBindVertexArray(planeObj->VAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                // 2. generate SSAO texture
+                // ------------------------
+                glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+                glClear(GL_COLOR_BUFFER_BIT);
+                planeObj->ssaoTexture.Bind();
+                planeObj->ssaoTexture["projection"] = proj;
+                planeObj->ssaoTexture["radius"] = sample_sphere_radius;
+                glBindVertexArray(planeObj->VAO);
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
+                glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                break;
+            case 3: 
+                // SSAO+
+                // 1. geometry pass: render scene's geometry/normal data into gbuffer
+                // -----------------------------------------------------------------
+                glBindFramebuffer(GL_FRAMEBUFFER, gbuffer);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                drawScene(view,proj,4); // draw scene with ssao+_geometry_fs
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                
+                // 2. generate SSAO+ texture
+                // ------------------------
+                glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+                glClear(GL_COLOR_BUFFER_BIT);
+                planeObj->ssaoPlusTexture.Bind();
+                planeObj->ssaoPlusTexture["projection"] = proj;
+                planeObj->ssaoPlusTexture["radius"] = sample_sphere_radius;
+                glBindVertexArray(planeObj->VAO);
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
+                glActiveTexture(GL_TEXTURE2);
+                glBindTexture(GL_TEXTURE_2D, gNormal);
+                glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                break;
+            case 4: 
+                // NNAO
+                // 1. geometry pass: render scene's geometry/normal data into gbuffer
+                // -----------------------------------------------------------------
+                glBindFramebuffer(GL_FRAMEBUFFER, gbuffer);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                drawScene(view,proj,5); // draw scene with nnao_geometry_fs
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        // 3. render blur texture
+                // 2. generate NNAO texture
+                // ------------------------
+                glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+                glClear(GL_COLOR_BUFFER_BIT);
+                planeObj->nnaoTexture.Bind();
+                planeObj->nnaoTexture["cam_proj"] = proj;
+                planeObj->nnaoTexture["radius"] = sample_sphere_radius;
+                glBindVertexArray(planeObj->VAO);
+                // set gbuffer
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
+                glActiveTexture(GL_TEXTURE2);
+                glBindTexture(GL_TEXTURE_2D, gNormal);
+                // set filters
+                glActiveTexture(GL_TEXTURE3);
+                glBindTexture(GL_TEXTURE_2D, F_tex[0]);
+                glActiveTexture(GL_TEXTURE4);
+                glBindTexture(GL_TEXTURE_2D, F_tex[1]);
+                glActiveTexture(GL_TEXTURE5);
+                glBindTexture(GL_TEXTURE_2D, F_tex[2]);
+                glActiveTexture(GL_TEXTURE6);
+                glBindTexture(GL_TEXTURE_2D, F_tex[3]);
+
+                //draw to texture
+                glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                break;
+        }
+
+        // 3. draw blurred ssao texture
         render_blur_texture();
-
         // 4. final render with AO applied
         render_with_occ(view, proj);
-    } else if (AOMode == 3) { // SSAO+ 
-        // 1. geometry pass: render scene's geometry/normal data into gbuffer
-        // -----------------------------------------------------------------
-        glBindFramebuffer(GL_FRAMEBUFFER, gbuffer);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        for (int i=1;i<scene.size();i++) {
-            shared_ptr<Object> modelObj = scene[i];
-            modelObj->progs[4]->Bind();
-            (*modelObj->progs[4])["model"] = modelObj->modelMatrix;
-            (*modelObj->progs[4])["view"] = view;
-            (*modelObj->progs[4])["projection"] = proj;
-            glBindVertexArray(modelObj->VAO);
-            glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
-        }
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        
-        // 2. generate SSAO+ texture
-        // ------------------------
-        glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
-        glClear(GL_COLOR_BUFFER_BIT);
-        planeObj->ssaoPlusTexture.Bind();
-        planeObj->ssaoPlusTexture["projection"] = proj;
-        planeObj->ssaoPlusTexture["radius"] = sample_sphere_radius;
-        glBindVertexArray(planeObj->VAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, gNormal);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-          // 3. render blur texture
-        render_blur_texture();
-
-        // 4. final render with AO applied
-        render_with_occ(view, proj);
-
-    } else if (AOMode == 4) { // NNAO
-        // 1. geometry pass: render scene's geometry/normal data into gbuffer
-        // -----------------------------------------------------------------
-        glBindFramebuffer(GL_FRAMEBUFFER, gbuffer);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        for (int i=1;i<scene.size();i++) {
-            shared_ptr<Object> modelObj = scene[i];
-            modelObj->progs[5]->Bind();
-            (*modelObj->progs[5])["model"] = modelObj->modelMatrix;
-            (*modelObj->progs[5])["view"] = view;
-            (*modelObj->progs[5])["projection"] = proj;
-            glBindVertexArray(modelObj->VAO);
-            glDrawElements(GL_TRIANGLES, modelObj->mesh.NF() * 3, GL_UNSIGNED_INT, 0);
-        }
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        // 2. generate NNAO texture
-        // ------------------------
-        glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
-        glClear(GL_COLOR_BUFFER_BIT);
-        planeObj->nnaoTexture.Bind();
-        planeObj->nnaoTexture["cam_proj"] = proj;
-        planeObj->nnaoTexture["radius"] = sample_sphere_radius;
-        glBindVertexArray(planeObj->VAO);
-        // set gbuffer
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, viewSpacePosTexture);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, gNormal);
-        // set filters
-        glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, F_tex[0]);
-        glActiveTexture(GL_TEXTURE4);
-        glBindTexture(GL_TEXTURE_2D, F_tex[1]);
-        glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_2D, F_tex[2]);
-        glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_2D, F_tex[3]);
-
-        //draw to texture
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
-        // 3. blur ssao texture
-        render_blur_texture();
-
-         // 4. final render with AO applied
-        render_with_occ(view, proj);
-
     }
+
     glutSwapBuffers();
 }
 

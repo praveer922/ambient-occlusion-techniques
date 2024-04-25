@@ -281,7 +281,6 @@ CMakeFiles/AOdemo.dir/main.cpp.o: \
  /usr/include/X11/Xutil.h /usr/include/X11/keysym.h \
  /usr/include/X11/keysymdef.h /usr/include/GL/glxext.h \
  /usr/include/inttypes.h \
- /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/includes/lodepng.h \
  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Camera.h \
  /mnt/c/Users/tewar/Documents/Utah/ambient-occlusion-techniques/source/Util.h \
  /usr/include/SDL2/SDL.h /usr/include/SDL2/SDL_main.h \
